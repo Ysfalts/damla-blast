@@ -3791,6 +3791,48 @@
     });
   }
 
+  // ============================================================================
+  // SÜRÜM ETİKETİ & OTOMATİK GÜNCELLEME
+  // Ana ekrana eklenmiş uygulama veya açık kalan Safari sekmesi, açılınca sayfayı yeniden
+  // indirmeden eski sürümü göstermeye devam edebiliyor. Açılışta ve uygulama öne geldiğinde
+  // yayındaki index.html'deki sürümle karşılaştırıp gerekiyorsa yeni sürümü yükle.
+  // ============================================================================
+  const APP_VERSION = (() => {
+    const s = document.querySelector('script[src*="game.js"]');
+    const m = s && /[?&]v=(\d+)/.exec(s.getAttribute("src") || "");
+    return m ? m[1] : null;
+  })();
+  const STORAGE_KEY_UPDATE_TRIED = "damla_blast_update_tried_v";
+
+  let updateCheckInFlight = false;
+  function checkForNewVersion() {
+    if (!APP_VERSION || updateCheckInFlight || location.protocol === "file:") return;
+    // Sürükleme ortasında veya bir pencere açıkken sayfayı yenileme
+    if (state.dragging || document.querySelector("dialog[open]")) return;
+    updateCheckInFlight = true;
+    fetch(`${location.pathname}?update-check=${Date.now()}`, { cache: "no-store" })
+      .then((r) => (r.ok ? r.text() : ""))
+      .then((html) => {
+        const m = /game\.js\?v=(\d+)/.exec(html);
+        if (!m || m[1] === APP_VERSION) return;
+        // Aynı sürüm için yalnızca bir kez dene (yayın gecikirse sonsuz yenileme olmasın)
+        let tried = null;
+        try {
+          tried = window.sessionStorage.getItem(STORAGE_KEY_UPDATE_TRIED);
+          window.sessionStorage.setItem(STORAGE_KEY_UPDATE_TRIED, m[1]);
+        } catch (e) {
+          // yoksay
+        }
+        if (tried === m[1]) return;
+        saveGameState();
+        location.replace(`${location.pathname}?v=${m[1]}`);
+      })
+      .catch(() => {})
+      .finally(() => {
+        updateCheckInFlight = false;
+      });
+  }
+
   function init() {
     // Görselleri beklemeden oyunu hemen başlat; yüzler indikçe otomatik yerine oturur.
     syncUIFromConfig();
@@ -3806,6 +3848,16 @@
 
     reloadPhotos(() => {
       if (playLabel) playLabel.textContent = originalLabel;
+    });
+
+    const versionEl = document.getElementById("app-version");
+    if (versionEl && APP_VERSION) versionEl.textContent = `sürüm ${APP_VERSION}`;
+    setTimeout(checkForNewVersion, 1500);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") checkForNewVersion();
+    });
+    window.addEventListener("pageshow", (e) => {
+      if (e.persisted) checkForNewVersion();
     });
   }
 
