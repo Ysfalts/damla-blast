@@ -1,6 +1,6 @@
 # Damla Blast 👑 Doğum Günü Özel
 
-Damla'nın doğum günü için özel olarak tasarlanmış, erkek arkadaşı temalı **Block Blast** oyunu.
+Damla'nın doğum günü için özel olarak tasarlanmış, Metehan temalı **Block Blast** oyunu.
 
 ## 🚀 Nasıl Çalıştırılır?
 Hiçbir kurulum gerektirmez! Klasördeki [`index.html`](file:///Users/ysfalts/Documents/antigravity/Damla%20Block%20Blast/index.html) dosyasına çift tıklayarak tarayıcıda doğrudan açabilirsin.

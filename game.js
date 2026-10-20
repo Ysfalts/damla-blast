@@ -63,13 +63,13 @@
       unlockScore: 0,
       role: "Başlangıç Paketi • Her Zaman Yanında",
       power: "✨ Özel Yetenek: Damla'ya her koşulda hayranlıkla bakma ve moral verme garantisi.",
-      quote: "Gülüşün bütün oyun tahtasını aydınlatıyor sevgilim, iyi ki doğdun! ❤️"
+      quote: "Gülüşün bütün oyun tahtasını aydınlatıyor bitanem, iyi ki doğdun! ❤️"
     },
     {
       key: "love",
       name: "Kalp Gözlü 😍",
       unlockScore: 0,
-      role: "Başlangıç Paketi • Aşık Modu",
+      role: "Başlangıç Paketi • Hayran Modu",
       power: "💖 Özel Yetenek: Tek satır bile patlatsan Dünya Kupası kazanmışsın gibi alkışlar.",
       quote: "Sen blok yerleştirirken bile dünyanın en tatlı insanısın! 😍🎂"
     },
@@ -79,7 +79,7 @@
       unlockScore: 0,
       role: "Başlangıç Paketi • Sıkışma Alarmı",
       power: "🚨 Özel Yetenek: Tahta %65 dolduğunda soğuk terler döküp seni uyarır.",
-      quote: "Aşkım tahta biraz doldu sanki... Yanarsan vallahi benim suçum değil! 😅"
+      quote: "Canım tahta biraz doldu sanki... Yanarsan vallahi benim suçum değil! 😅"
     },
     {
       key: "sorry",
@@ -87,7 +87,7 @@
       unlockScore: 0,
       role: "Joker Karakteri • 3x3 Bomba",
       power: "💐 Özel Yetenek: 'Özür Dilerim Haklısın' jokeriyle 3x3 alanı güllerle tertemiz açar.",
-      quote: "Ne konuda olduğunu bilmiyorum ama %100 sen haklısın aşkım, al çiçeklerin! 💐"
+      quote: "Ne konuda olduğunu bilmiyorum ama %100 sen haklısın canım, al çiçeklerin! 💐"
     },
     {
       key: "cool",
@@ -95,7 +95,7 @@
       unlockScore: 0,
       role: "Joker Karakteri • Hallederiz Modu",
       power: "😎 Özel Yetenek: 'Ben Hallederim' jokeriyle en zor anında 3 adet kurtarıcı 1x1 blok verir.",
-      quote: "Sen hiç stres yapma güzelim, arkanı yaslan Metehan halleder! 😎✨"
+      quote: "Sen hiç stres yapma bitanem, arkanı yaslan Metehan halleder! 😎✨"
     },
     {
       key: "party",
@@ -127,7 +127,7 @@
       unlockScore: 0,
       role: "+150 Bonus Puan",
       power: "😭 Özel Yetenek: Patlatıldığında 'Trip Çözüldü' bonusu olarak +150 ekstra puan kazandırır!",
-      quote: "Tamam aşkım bir daha 'fark etmez' demeyeceğim, nereye istersen oraya gidiyoruz! 😭❤️"
+      quote: "Tamam canım bir daha 'fark etmez' demeyeceğim, nereye istersen oraya gidiyoruz! 😭❤️"
     },
     {
       key: "broke",
@@ -139,7 +139,7 @@
     },
     {
       key: "king",
-      name: "Kral Damat 👑",
+      name: "Kral Metehan 👑",
       unlockScore: 0,
       role: "Büyük Final Ödülü • VIP Mod",
       power: "👑 Özel Yetenek: Büyük Doğum Günü Senedini mühürler ve tahtayı kraliçesi için kurtarır.",
@@ -1237,7 +1237,7 @@
   // DİNAMİK KONUŞMA BALONU & DUYGU DURUMU YÖNETİCİSİ
   // ============================================================================
   const MOOD_META = {
-    happy: { emoji: "😊", tag: "Aşık & İtaatkar", cls: "mood-happy" },
+    happy: { emoji: "😊", tag: "Hayran & İtaatkar", cls: "mood-happy" },
     love: { emoji: "😍", tag: "Hayran Kaldı 👑", cls: "mood-happy" },
     party: { emoji: "🥳", tag: "Doğum Günü Modu", cls: "mood-happy" },
     cool: { emoji: "😎", tag: "Ben Hallederim", cls: "mood-happy" },
@@ -1946,11 +1946,11 @@
     const quote = quoteDeck.pick("bombUsed");
     if (!state.tierJustUnlocked) setManitaMood("sorry", quote);
     spawnFloatingComicText("💐 ÖZÜR DİLERİM!", (centerC + 0.5) * state.cellSize, (centerR + 0.5) * state.cellSize);
-    showComboShowcase("ÖZÜR DİLERİM AŞKIM! 💐", quote, "sorry");
+    showComboShowcase("ÖZÜR DİLERİM CANIM! 💐", quote, "sorry");
     saveGameState();
   }
 
-  // Joker 2: "Ben Hallederim Aşkım" (1x1 Kolay Bloklar)
+  // Joker 2: "Ben Hallederim Canım" (1x1 Kolay Bloklar)
   function executeRerollJoker() {
     if (state.rerollCount <= 0) return;
     state.rerollCount--;
@@ -2033,7 +2033,7 @@
     sfx.playBomb();
     triggerBoardShake();
     setManitaMood("king", "Kraliçem her zaman haklıdır! Tahtayı senin için tertemiz açtım 👑❤️");
-    showComboShowcase("TORPİL AKTİF! 👑", "SEN HEP HAKLISIN AŞKIM!", "king");
+    showComboShowcase("TORPİL AKTİF! 👑", "SEN HEP HAKLISIN BİTANEM!", "king");
     saveGameState();
   }
 
@@ -2129,7 +2129,7 @@
     ctx.textBaseline = "middle";
     ctx.fillText("🎂 DAMLA BLAST • RESMİ DOĞUM GÜNÜ SENEDİ 🎂", W / 2, 115);
 
-    // 3. Kral Damat Metehan Portresi
+    // 3. Kral Metehan Portresi
     const avatarX = W / 2;
     const avatarY = 295;
     const avatarR = 112;
@@ -2313,7 +2313,7 @@
     const ts = tierScoreText;
     const msg =
       `🚨 *RESMİ DOĞUM GÜNÜ SENEDİ BİLDİRİMİ* 🚨\n\n` +
-      `Sevgili ${bf}, *Damla Blast* oyununda *${scoreVal.toLocaleString("tr-TR")} Puan* yaparak bütün doğum günü ödüllerini resmen kazandım! 🎂👑\n\n` +
+      `Sayın ${bf}, *Damla Blast* oyununda *${scoreVal.toLocaleString("tr-TR")} Puan* yaparak bütün doğum günü ödüllerini resmen kazandım! 🎂👑\n\n` +
       `*Kazanılan Resmi Haklarım:*\n` +
       `✅ ☕ Kahve Sözü (${ts(1)} Puan)\n` +
       `✅ 🍰 İstediğim Tatlı (${ts(2)} Puan)\n` +
@@ -3937,7 +3937,7 @@
         { mood: "mangal", quote: "Maşayı bıraktım sana bakıyorum Damla'm, hadi patlat bir satır 🔥" },
         { mood: "king", quote: "Doğum günü kraliçesi ne derse o olur, emrindeyim 👑❤️" },
         { mood: "love", quote: "Bana her dokunduğunda kalbim yerinden çıkacakmış gibi çarpıyor 😍❤️" },
-        { mood: "party", quote: "İyi ki doğdun sevgilim! Düdüğü senin için çalıyorum 🥳🎂" }
+        { mood: "party", quote: "İyi ki doğdun canım! Düdüğü senin için çalıyorum 🥳🎂" }
       ];
       const pick = tapOptions[Math.floor(Math.random() * tapOptions.length)];
       setManitaMood(pick.mood, pick.quote);

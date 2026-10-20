@@ -24,7 +24,7 @@ window.DAMLA_CONFIG = {
     crying: "assets/faces/metehan_crying.jpg",       // 8. Trip Yemiş / Ağlayan Metehan
     party: "assets/faces/metehan_party.jpg",         // 9. Doğum Günü Partisi Şapkalı
     broke: "assets/faces/metehan_broke.jpg",         // 10. Cüzdanı Ağlayan / Hesap Ödeyen
-    king: "assets/faces/metehan_king.jpg",           // 11. Kral Tacı / Damat Metehan
+    king: "assets/faces/metehan_king.jpg",           // 11. Kral Tacı Metehan
     mindblown: "assets/faces/metehan_king.jpg"  // 12. Aklı Başından Gitmiş (Mega Kombo)
   },
 
@@ -71,7 +71,7 @@ window.DAMLA_CONFIG = {
       rewardShort: "🍽️ Akşam Yemeği + Tatlı",
       unlockedFaces: ["crying", "broke"],
       unlockedPersonaName: "😭 Trip Yemiş & Şaşkın Metehan (+150 Bonus Puan Bloğu!)",
-      quote: "Bu skor ne böyle?! Harikasın aşkım, romantik akşam yemeği sözüm de kilitlendi! 😍🍽️"
+      quote: "Bu skor ne böyle?! Harikasın canım, romantik akşam yemeği sözüm de kilitlendi! 😍🍽️"
     },
     {
       score: 10000,
@@ -79,8 +79,8 @@ window.DAMLA_CONFIG = {
       walletStatus: "Tüm Sürprizler Açıldı 👑",
       rewardShort: "👑 VIP Tam Paket + %100 Haklılık",
       unlockedFaces: ["king", "mindblown"],
-      unlockedPersonaName: "👑 Kraliyet Damat Metehan (Tüm Yüzler Açıldı!)",
-      quote: "TEBRİKLER AŞKIM! Rekorları altüst ettin, VIP Doğum Günü Kuponun hazır! 🎂❤️"
+      unlockedPersonaName: "👑 Kraliyet Metehan (Tüm Yüzler Açıldı!)",
+      quote: "TEBRİKLER BİTANEM! Rekorları altüst ettin, VIP Doğum Günü Kuponun hazır! 🎂❤️"
     }
   ],
 
@@ -91,7 +91,7 @@ window.DAMLA_CONFIG = {
       sender: "Metehan ❤️",
       time: "şimdi",
       avatarMood: "love",
-      message: "Aşkım bu ne hız?! Daha ısınma turundaydık, rekorumu tarihe gömdün resmen 😍👑"
+      message: "Canım bu ne hız?! Daha ısınma turundaydık, rekorumu tarihe gömdün resmen 😍👑"
     },
     {
       score: 5500,
@@ -112,7 +112,7 @@ window.DAMLA_CONFIG = {
       sender: "Metehan ❤️",
       time: "şimdi",
       avatarMood: "king",
-      message: "Doğum günü kraliçem durdurulamıyor! İstediğin her yerde kutlama sözüm olsun sevgilim 🎂❤️"
+      message: "Doğum günü kraliçem durdurulamıyor! İstediğin her yerde kutlama sözüm olsun bitanem 🎂❤️"
     }
   ],
 
@@ -152,7 +152,7 @@ window.DAMLA_CONFIG = {
     // 9 saniye boyunca hamle yapmadığında otomatik tetiklenir
     idleTimeout: [
       "Damla uyudun mu yoksa bana trip mi atıyorsun? 🥺",
-      "Aşkım mangaldaki etler yandı, hâlâ tek bir blok koymadın! 🔥",
+      "Canım mangaldaki etler yandı, hâlâ tek bir blok koymadın! 🔥",
       "Biliyorum yüzüme bakmaktan oyuna odaklanamıyorsun 😎",
       "Alooo doğum günü kızı, sıradaki hamleni heyecanla bekliyorum! 🎂",
       "Şapkamı düzeltip bekliyorum, hadi patlat bir satır artık!"
@@ -169,13 +169,13 @@ window.DAMLA_CONFIG = {
     bigPiecePlaced: [
       "O dev bloğu oraya nasıl sığdırdın?! Benim dambıllardan büyük! 💪",
       "Koca bloğu tek hamlede yerleştirdi, saygıyla eğiliyorum 🙇‍♂️",
-      "Tahtanın yarısını kapattın aşkım, üstüme üstüme geliyorsun!"
+      "Tahtanın yarısını kapattın bitanem, üstüme üstüme geliyorsun!"
     ],
 
     // 3 hamle üst üste satır patlatamayınca
     noClearStreak: [
       "Damla yemin ederim zor blokları ben seçmiyorum, kızma! 😅",
-      "Aşkım vallahi algoritmanın suçu, Metehan'ın hiçbir günahı yok!",
+      "Canım vallahi algoritmanın suçu, Metehan'ın hiçbir günahı yok!",
       "Böyle bakma, tamam bir sonraki elde en kolay blokları vereceğim!",
       "Bak ağlamaya başlayacağım şimdi, lütfen bir satır patlat artık 😭",
       "Yüzüme baka baka tahtayı doldurdun, birazdan sıkışacağım!"
@@ -184,7 +184,7 @@ window.DAMLA_CONFIG = {
     // Tahta %65'ten fazla dolduğunda
     boardCrowded: [
       "Damla yer kalmadı, sıkıştım burada! Nefes alamıyorum! 🥵",
-      "Sporda bile bu kadar terlemedim aşkım, imdat! 😱",
+      "Sporda bile bu kadar terlemedim canım, imdat! 😱",
       "Alttaki 'Özür Dilerim' bombasını mı kullansan? Boğuluyorum!",
       "Beni harcama Damla, doğum günün hatırına bir joker bas! 🙏",
       "Tahta kilitleniyor, kalbim küt küt atıyor şu an!"
@@ -195,7 +195,7 @@ window.DAMLA_CONFIG = {
       "HELAL DAMLA'MA! 😍",
       "İşte benim favori oyuncum be!",
       "Nasıl da patlattı ama! 👏",
-      "Harikasın sevgilim, böyle devam! 🌟",
+      "Harikasın bitanem, böyle devam! 🌟",
       "Zeka küpü müsün mübarek!",
       "Kafamı patlattın ama sana feda olsun ❤️"
     ],
@@ -215,17 +215,17 @@ window.DAMLA_CONFIG = {
       "DÜNYANIN EN İYİ BLOCK BLAST OYUNCUSU! 🏆",
       "ŞOV YAPIYOR ŞOV! KRALİÇEM BENİM! 🔥",
       "AKLIM BAŞIMDAN GİTTİ DAMLA, BU NASIL KOMBO?! 🤯❤️",
-      "REKORLARIN EFENDİSİ! Doğum günün kutlu olsun sevgilim 🎂👑"
+      "REKORLARIN EFENDİSİ! Doğum günün kutlu olsun canım 🎂👑"
     ],
 
     // Özel Etkinlik Blokları Patladığında
     eventGym: [
       "SPORCU METEHAN DEVREDE! Dambılla yan blokları da ezdim senin için 💪",
-      "AirPods'umu taktım, senin için etraftaki fazla blokları kırdım aşkım! 🏋️‍♂️"
+      "AirPods'umu taktım, senin için etraftaki fazla blokları kırdım canım! 🏋️‍♂️"
     ],
     eventMangal: [
       "MANGALCI METEHAN ŞOV! Ateşimle sana +1 bedava Joker hakkı pişirdim 🔥🍖",
-      "Maşayı şıklattım, alttaki joker hakkını senin için doldurdum sevgilim! 🔥"
+      "Maşayı şıklattım, alttaki joker hakkını senin için doldurdum bitanem! 🔥"
     ],
     eventTrip: [
       "TRİPLER ÇÖZÜLDÜ! Ağlayan Metehan'ın gönlünü aldın, +150 BONUS PUAN! 😭❤️",
@@ -239,9 +239,9 @@ window.DAMLA_CONFIG = {
       "Hemen açıyorum orayı, yeter ki sen sinirlenme!"
     ],
     rerollUsed: [
-      "Ben hallederim aşkım! Gözlüğümü taktım, o zor blokları kovdum 😎",
+      "Ben hallederim canım! Gözlüğümü taktım, o zor blokları kovdum 😎",
       "Mercedes konforunda 1x1 lokum gibi bloklar getirdim sana!",
-      "Sen yorulma diye en kolaylarını seçtim sevgilim 😘"
+      "Sen yorulma diye en kolaylarını seçtim tatlım 😘"
     ]
   },
 
@@ -250,8 +250,8 @@ window.DAMLA_CONFIG = {
     "ŞAAAK! 💥",
     "YİNE HAKLISIN! 👑",
     "DOĞUM GÜNÜ KRALİÇESİ! 🎂",
-    "HELAL AŞKIMA! ❤️",
-    "AŞKIM YAVAŞ! 😱",
+    "HELAL CANIMA! ❤️",
+    "CANIM YAVAŞ! 😱",
     "TAM İSABET! 🎯",
     "KRALİÇE HAREKETİ! ✨",
     "METEHAN ŞOK! 🤯"
