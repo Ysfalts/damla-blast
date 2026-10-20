@@ -212,6 +212,28 @@
     }
   }
 
+  // iPadOS 13+ kendini Mac olarak tanıttığı için dokunmatik nokta sayısıyla da kontrol edilir
+  const IS_IOS =
+    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+  function hapticTick() {
+    try {
+      const label = document.createElement("label");
+      label.setAttribute("aria-hidden", "true");
+      label.style.display = "none";
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.setAttribute("switch", "");
+      label.appendChild(input);
+      document.head.appendChild(label);
+      label.click();
+      document.head.removeChild(label);
+    } catch (e) {
+      // desteklenmiyorsa sessizce geç
+    }
+  }
+
   // ============================================================================
   // SES EFEKT MOTORU & DAMLA ÖZEL MÜZİK KUTUSU (Web Audio API - Kalimba & SFX)
   // ============================================================================
@@ -238,47 +260,34 @@
 
     vibrate(pattern) {
       if (!this.enabled) return;
+      // iPhone'da navigator.vibrate ya yok ya da hiçbir şey yapmıyor: doğrudan haptic yöntemine geç
+      if (IS_IOS) {
+        this.iosHaptic(pattern);
+        return;
+      }
       try {
         if (window.navigator && typeof window.navigator.vibrate === "function") {
           window.navigator.vibrate(pattern);
-          return;
         }
       } catch (e) {
         // yoksay
       }
-      this.iosHaptic(pattern);
     }
 
-    // iPhone Safari navigator.vibrate desteklemiyor. iOS 18+ Safari'de gizli bir
-    // "switch" checkbox'ın etiketine tıklamak sistemin dokunsal (haptic) tıkını tetikler.
-    // Desen [titreşim, bekleme, titreşim, ...] ise her titreşim için bir tık atılır.
+    // iOS 18+ Safari'de "switch" checkbox'ın etiketine tıklamak sistemin dokunsal tıkını tetikler
+    // (ios-haptics kütüphanesindeki yöntem: her seferinde yeni, display:none etiket, <head> içinde).
+    // Desen [titreşim, bekleme, titreşim, ...] ise her titreşim için bir tık atılır; ilki dokunma
+    // olayının içinde anında atılır, çünkü iOS yalnızca kullanıcı etkileşimi sırasında izin veriyor.
     iosHaptic(pattern) {
-      try {
-        if (!this.hapticLabel) {
-          const label = document.createElement("label");
-          label.setAttribute("aria-hidden", "true");
-          label.style.cssText =
-            "position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden;";
-          const input = document.createElement("input");
-          input.type = "checkbox";
-          input.setAttribute("switch", "");
-          input.tabIndex = -1;
-          label.appendChild(input);
-          document.body.appendChild(label);
-          this.hapticLabel = label;
+      const steps = Array.isArray(pattern) ? pattern : [pattern];
+      let offset = 0;
+      for (let i = 0; i < steps.length; i += 2) {
+        if (offset === 0) {
+          hapticTick();
+        } else {
+          setTimeout(hapticTick, offset);
         }
-        const steps = Array.isArray(pattern) ? pattern : [pattern];
-        let offset = 0;
-        for (let i = 0; i < steps.length; i += 2) {
-          if (offset === 0) {
-            this.hapticLabel.click();
-          } else {
-            setTimeout(() => this.hapticLabel.click(), offset);
-          }
-          offset += (steps[i] || 0) + (steps[i + 1] || 0);
-        }
-      } catch (e) {
-        // desteklenmiyorsa sessizce geç
+        offset += (steps[i] || 0) + (steps[i + 1] || 0);
       }
     }
 
@@ -3089,8 +3098,10 @@
   // DOKUNMATİK (TOUCH) VE FARE (MOUSE) SÜRÜKLE-BIRAK KONTROLLERİ (0ms GECİKME)
   // ============================================================================
   // Sürükleme hız çarpanı: 1.0 = blok parmakla birebir (1:1) hareket eder.
-  // Hissiyat ayarı gerekirse yalnızca bu sabiti değiştirmek yeterli.
-  const DRAG_SPEED = 1.0;
+  // Gerçek Block Blast'taki gibi dokunmatikte blok parmaktan biraz hızlı gider; parmak az
+  // hareket ederken blok tahtaya çabuk ulaşır. Hissiyat ayarı için yalnızca bu sabitler yeterli.
+  const DRAG_SPEED_TOUCH = 1.3;
+  const DRAG_SPEED_MOUSE = 1.0;
 
   // Aktif sürüklemeyi başlatan parmağı (touch identifier) takip ederek
   // ikinci bir parmağın sürüklemeyi bozmasını engeller.
@@ -3122,9 +3133,10 @@
   function computeDraggedCenter(pos, dragState) {
     const dx = pos.x - dragState.startX;
     const dy = pos.y - dragState.startY;
+    const speed = pos.isTouch ? DRAG_SPEED_TOUCH : DRAG_SPEED_MOUSE;
     return {
-      x: dragState.startX + dx * DRAG_SPEED,
-      y: dragState.startY - dragState.liftOffset + dy * DRAG_SPEED
+      x: dragState.startX + dx * speed,
+      y: dragState.startY - dragState.liftOffset + dy * speed
     };
   }
 
