@@ -7,6 +7,18 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Damla Blast" />
   <meta name="theme-color" content="#131936" />
+  <meta name="description" content="İyi ki doğdun Damla! Pastadaki mumları üfle, Metehan bloklarını patlat ve sürpriz doğum günü hediyelerini kazan!" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://ysfalts.github.io/damla-blast/" />
+  <meta property="og:title" content="🎂 İyi ki Doğdun Damla! • Sana Özel Doğum Günü Oyunu 👑" />
+  <meta property="og:description" content="Önce pastadaki D-A-M-L-A mumlarını üfle, sonra Metehan'ı patlatıp sürpriz hediyeleri kazan! ❤️" />
+  <meta property="og:image" content="https://ysfalts.github.io/damla-blast/assets/og-preview.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="🎂 İyi ki Doğdun Damla! • Sana Özel Doğum Günü Oyunu 👑" />
+  <meta name="twitter:description" content="Önce pastadaki D-A-M-L-A mumlarını üfle, sonra Metehan'ı patlatıp sürpriz hediyeleri kazan! ❤️" />
+  <meta name="twitter:image" content="https://ysfalts.github.io/damla-blast/assets/og-preview.jpg" />
   <title>Damla Blast 👑 Doğum Günü Özel</title>
   <link rel="apple-touch-icon" sizes="180x180" href="assets/icon-180.png" />
   <link rel="icon" type="image/png" href="assets/icon-180.png" />
@@ -14,7 +26,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=7" />
+  <link rel="stylesheet" href="style.css?v=8" />
 </head>
 <body>
   <div id="app-shell" class="app-shell">
@@ -115,7 +127,7 @@
           <button id="btn-replay-cake" class="btn-secondary" type="button">
             🎂 Doğum Günü Pastası Mumlarını Yak
           </button>
-          <button id="btn-open-settings-start" class="btn-secondary" type="button">
+          <button id="btn-open-settings-start" class="btn-secondary hidden" type="button">
             ⚙️ Fotoğraf &amp; İsim Özelleştir
           </button>
         </div>
@@ -142,7 +154,7 @@
         </div>
 
         <div class="top-controls">
-          <button id="btn-open-collection" class="icon-btn" type="button" title="Metehan Koleksiyonu & Cüzdan Durumu">
+          <button id="btn-open-collection" class="icon-btn" type="button" title="Metehan Koleksiyonu & Sürpriz Hediyeler">
             🃏
           </button>
           <button id="btn-gift-coupon" class="icon-btn gift-btn" type="button" title="Doğum Günü Hediyesi">
@@ -155,7 +167,7 @@
           <button id="btn-sound-toggle" class="icon-btn" type="button" title="Ses Efektleri Aç/Kapat">
             🔊
           </button>
-          <button id="btn-open-settings" class="icon-btn" type="button" title="Fotoğraf & Ayarlar">
+          <button id="btn-open-settings" class="icon-btn hidden" type="button" title="Fotoğraf & Ayarlar">
             ⚙️
           </button>
         </div>
@@ -187,7 +199,7 @@
           <div class="speech-header">
             <span id="ui-boyfriend-name" class="speech-name">Metehan</span>
             <span id="ui-mood-tag" class="speech-mood-tag mood-happy">Aşık &amp; İtaatkar</span>
-            <span id="ui-wallet-badge" class="wallet-mini-badge">💸 Cüzdan Rahat</span>
+            <span id="ui-wallet-badge" class="wallet-mini-badge">🎁 Sürprizler Hazır</span>
           </div>
           <p id="ui-speech-text" class="speech-text">
             İyi ki doğdun Damla'm! Bugün bütün bloklar sana feda ❤️
@@ -353,7 +365,7 @@
     <dialog id="dialog-collection" class="game-dialog collection-dialog">
       <div class="dialog-card settings-card">
         <div class="settings-top">
-          <h2 class="dialog-title">🃏 Metehan Evreni &amp; Cüzdan</h2>
+          <h2 class="dialog-title">🃏 Metehan Evreni &amp; Hediyeler</h2>
           <button id="btn-close-collection-x" class="close-x-btn" type="button" aria-label="Kapat">✕</button>
         </div>
 
@@ -373,7 +385,7 @@
           </div>
         </div>
 
-        <div class="guide-title">💸 Puanla Katlanan Doğum Günü Hediyesi</div>
+        <div class="guide-title">🎁 Puanla Açılan Doğum Günü Hediyeleri</div>
         <div id="collection-tiers-list" class="collection-tiers-list">
           <!-- JS ile doldurulur -->
         </div>
@@ -475,7 +487,7 @@
     </dialog>
   </div>
 
-  <script src="config.js?v=7"></script>
-  <script src="game.js?v=7"></script>
+  <script src="config.js?v=8"></script>
+  <script src="game.js?v=8"></script>
 </body>
 </html>

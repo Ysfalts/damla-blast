@@ -1488,7 +1488,8 @@ dialog::backdrop {
   animation: fadeIn 0.35s ease-out;
 }
 
-.cake-card {
+.cake-card,
+.cake-ceremony-card {
   width: 100%;
   max-width: 400px;
   background: linear-gradient(180deg, rgba(44, 29, 89, 0.96) 0%, rgba(20, 27, 64, 0.98) 100%);
@@ -1501,6 +1502,49 @@ dialog::backdrop {
   flex-direction: column;
   align-items: center;
   gap: 10px;
+}
+
+.cake-mascot-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(12, 18, 44, 0.65);
+  border: 1.5px solid rgba(255, 255, 255, 0.14);
+  border-radius: 18px;
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.cake-mascot-avatar {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 2.5px solid var(--gold);
+  background: #172048;
+}
+
+.cake-mascot-avatar canvas {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: block;
+}
+
+.cake-mascot-badge {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  font-size: 1.15rem;
+}
+
+.cake-mascot-speech {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #e9efff;
+  line-height: 1.32;
 }
 
 .cake-title {
@@ -1607,14 +1651,16 @@ dialog::backdrop {
   }
 }
 
-.wa-toast-avatar-wrap {
+.wa-toast-avatar-wrap,
+.wa-avatar-wrap {
   position: relative;
   width: 46px;
   height: 46px;
   flex-shrink: 0;
 }
 
-.wa-toast-avatar-wrap canvas {
+.wa-toast-avatar-wrap canvas,
+.wa-avatar-wrap canvas {
   width: 46px;
   height: 46px;
   border-radius: 50%;
@@ -1638,13 +1684,15 @@ dialog::backdrop {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
 }
 
-.wa-toast-body {
+.wa-toast-body,
+.wa-content {
   flex: 1;
   min-width: 0;
   text-align: left;
 }
 
-.wa-toast-top {
+.wa-toast-top,
+.wa-top-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1700,7 +1748,8 @@ dialog::backdrop {
   display: block;
 }
 
-.persona-detail-power {
+.persona-detail-power,
+.persona-power-box {
   font-size: 0.78rem;
   font-weight: 800;
   color: #80ffdb;
@@ -1711,7 +1760,8 @@ dialog::backdrop {
   width: 100%;
 }
 
-.persona-detail-quote {
+.persona-detail-quote,
+.persona-quote-box {
   font-size: 0.84rem;
   font-weight: 700;
   font-style: italic;

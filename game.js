@@ -742,6 +742,7 @@
   // ============================================================================
   const dom = {
     cakeCeremonyScreen: document.getElementById("cake-ceremony-screen"),
+    cakeAvatarCanvas: document.getElementById("cake-avatar-canvas"),
     cakeCanvas: document.getElementById("cake-canvas"),
     cakeCandleStatus: document.getElementById("cake-candle-status"),
     btnBlowAllCandles: document.getElementById("btn-blow-all-candles"),
@@ -771,8 +772,8 @@
 
     whatsappToast: document.getElementById("whatsapp-toast"),
     waAvatarCanvas: document.getElementById("wa-avatar-canvas"),
-    waSenderName: document.getElementById("wa-sender-name"),
-    waMessageText: document.getElementById("wa-message-text"),
+    waSenderName: document.getElementById("wa-sender") || document.getElementById("wa-sender-name"),
+    waMessageText: document.getElementById("wa-message") || document.getElementById("wa-message-text"),
 
     manitaLiveBar: document.getElementById("manita-live-bar"),
     manitaAvatarWrapper: document.getElementById("manita-avatar-wrapper"),
@@ -842,10 +843,14 @@
     collectionFacesGrid: document.getElementById("collection-faces-grid"),
 
     dialogPersonaDetail: document.getElementById("dialog-persona-detail"),
-    btnClosePersonaDetailX: document.getElementById("btn-close-persona-detail-x"),
+    btnClosePersonaDetailX:
+      document.getElementById("btn-close-persona-detail") ||
+      document.getElementById("btn-close-persona-detail-x"),
     personaDetailImg: document.getElementById("persona-detail-img"),
     personaDetailName: document.getElementById("persona-detail-name"),
-    personaDetailRole: document.getElementById("persona-detail-role"),
+    personaDetailRole:
+      document.getElementById("persona-detail-rarity") ||
+      document.getElementById("persona-detail-role"),
     personaDetailPower: document.getElementById("persona-detail-power"),
     personaDetailQuote: document.getElementById("persona-detail-quote"),
     btnActivatePersona: document.getElementById("btn-activate-persona"),
@@ -2624,6 +2629,11 @@
       heroCtx.clearRect(0, 0, 136, 136);
       drawBoyfriendAvatar(heroCtx, 68, 68, 64, "party");
     }
+    if (dom.cakeAvatarCanvas) {
+      const cakeAvCtx = dom.cakeAvatarCanvas.getContext("2d");
+      cakeAvCtx.clearRect(0, 0, 96, 96);
+      drawBoyfriendAvatar(cakeAvCtx, 48, 48, 45, "party");
+    }
   }
 
   // ============================================================================
@@ -3393,6 +3403,25 @@
     dom.btnOpenSettingsStart.addEventListener("click", openSettingsModal);
     dom.btnOpenSettings.addEventListener("click", openSettingsModal);
     dom.btnCloseSettingsX.addEventListener("click", () => dom.dialogSettings.close());
+
+    // 🔒 Gizli Ayarlar Tetikleyicisi: Girişteki doğum günü rozetine veya REKOR kutusuna
+    // art arda 5 kez dokunulduğunda gizli ayarlar paneli açılır.
+    let secretTapCount = 0;
+    let secretTapTimer = null;
+    const handleSecretSettingsTap = () => {
+      secretTapCount++;
+      if (secretTapTimer) clearTimeout(secretTapTimer);
+      if (secretTapCount >= 5) {
+        secretTapCount = 0;
+        openSettingsModal();
+      } else {
+        secretTapTimer = setTimeout(() => {
+          secretTapCount = 0;
+        }, 1800);
+      }
+    };
+    if (dom.birthdayPill) dom.birthdayPill.addEventListener("click", handleSecretSettingsTap);
+    if (dom.uiBestScore) dom.uiBestScore.addEventListener("click", handleSecretSettingsTap);
 
     dom.btnOpenCollection.addEventListener("click", openCollectionModal);
     dom.goalProgressWrap.addEventListener("click", openCollectionModal);
