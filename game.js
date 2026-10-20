@@ -902,6 +902,7 @@
     bombHoverCell: null,
     mood: "happy",
     dragging: null,
+    returning: null, // geçersiz bırakılan bloğun tepsiye dönüş animasyonu
     particles: [],
     floatingTexts: [], // 5. Madde: Tahta üstü çizgi roman balonları
     confetti: [],      // Tam ekran doğum günü konfeti yağmuru
@@ -2662,6 +2663,7 @@
       renderCakeCeremony();
     }
     renderBoard(dpr);
+    updateReturnAnim(performance.now());
     renderTray(dpr);
     renderLiveAvatars();
     renderConfetti(dpr);
@@ -2857,6 +2859,7 @@
       const piece = state.tray[i];
       if (!piece) continue;
       if (state.dragging && state.dragging.trayIndex === i) continue;
+      if (state.returning && state.returning.trayIndex === i) continue;
 
       if (piece.scaleAnim < 1) {
         piece.scaleAnim = Math.min(1, piece.scaleAnim + 0.14 * (state.dt || 1));
@@ -2864,7 +2867,8 @@
       }
 
       // Tepsideki bloklar tahta hücresinin ~%62'si kadar; küçük ekranlarda slota sığacak kadar küçülür
-      const baseCell = Math.min(state.cellSize * 0.62, (slotWidth - 12) / piece.cols, (rect.height - 12) / piece.rows);
+      // Block Blast videosunda tepsideki kare, tahta karesinin ~%45'i (21 pt / 47 pt)
+      const baseCell = Math.min(state.cellSize * 0.45, (slotWidth - 12) / piece.cols, (rect.height - 12) / piece.rows);
       if (!(baseCell > 2)) {
         // Tepsi henüz ölçülemedi (yerleşim/ekran döndürme anı): sonraki karede tekrar dene
         stillAnimating = true;
@@ -3230,8 +3234,23 @@
   // Sürükleme hız çarpanı: 1.0 = blok parmakla birebir (1:1) hareket eder.
   // Gerçek Block Blast'taki gibi dokunmatikte blok parmaktan biraz hızlı gider; parmak az
   // hareket ederken blok tahtaya çabuk ulaşır. Hissiyat ayarı için yalnızca bu sabitler yeterli.
-  const DRAG_SPEED_TOUCH = 1.3;
+  const DRAG_SPEED_TOUCH_DEFAULT = 1.3;
   const DRAG_SPEED_MOUSE = 1.0;
+  // Block Blast videosundan ölçüldü: alınan bloğun merkezi parmağın ~2,3 tahta karesi yukarısında
+  // durur (iki farklı yükseklikteki parçada da ~107-110 pt, kare 47 pt). Parmak bloğu kapatmaz.
+  const LIFT_CELLS_TOUCH_DEFAULT = 2.3;
+  const STORAGE_KEY_FEEL = "damla_blast_drag_feel_v1";
+  // Test panelinden telefonda canlı ayarlanabilir; ayar o cihaza kaydedilir
+  const dragFeel = { speed: DRAG_SPEED_TOUCH_DEFAULT, liftCells: LIFT_CELLS_TOUCH_DEFAULT };
+  try {
+    const savedFeel = JSON.parse(safeStorage.getItem(STORAGE_KEY_FEEL) || "null");
+    if (savedFeel && savedFeel.speed > 0) dragFeel.speed = Number(savedFeel.speed);
+    if (savedFeel && savedFeel.liftCells >= 0) dragFeel.liftCells = Number(savedFeel.liftCells);
+  } catch (e) {
+    // yoksay
+  }
+  // Geçersiz bırakılan blok tepsiye bu sürede kayarak döner (videoda ~150-200 ms, yavaşlayarak)
+  const RETURN_ANIM_MS = 180;
 
   // Aktif sürüklemeyi başlatan parmağı (touch identifier) takip ederek
   // ikinci bir parmağın sürüklemeyi bozmasını engeller.
@@ -3263,7 +3282,7 @@
   function computeDraggedCenter(pos, dragState) {
     const dx = pos.x - dragState.startX;
     const dy = pos.y - dragState.startY;
-    const speed = pos.isTouch ? DRAG_SPEED_TOUCH : DRAG_SPEED_MOUSE;
+    const speed = pos.isTouch ? dragFeel.speed : DRAG_SPEED_MOUSE;
     return {
       x: dragState.startX + dx * speed,
       y: dragState.startY - dragState.liftOffset + dy * speed
@@ -3309,7 +3328,9 @@
     sfx.playPickup();
     state.lastMoveTime = performance.now();
 
-    const liftOffset = pos.isTouch ? 58 : 18;
+    // Önceki blok hâlâ tepsiye dönüyorsa dönüşü hemen bitir
+    if (state.returning) finishReturnAnim();
+    const liftOffset = pos.isTouch ? Math.round(state.cellSize * dragFeel.liftCells) : 18;
     state.dragging = {
       trayIndex: slotIndex,
       piece,
@@ -3428,15 +3449,53 @@
     ) {
       return;
     }
-    const { trayIndex, valid, snapRow, snapCol } = state.dragging;
+    const { trayIndex, valid, snapRow, snapCol, piece, x, y } = state.dragging;
     state.dragging = null;
-    syncDragCanvasTransform();
     state.trayDirty = true;
     state.boardViewDirty = true;
 
     if (valid) {
+      syncDragCanvasTransform();
       placePieceOnBoard(trayIndex, snapRow, snapCol);
+    } else {
+      // Block Blast gibi: blok tam boyutta tepsideki yerine kayarak döner, sonra küçülür
+      const rect = dom.trayContainer.getBoundingClientRect();
+      state.returning = {
+        trayIndex,
+        piece,
+        fromX: x,
+        fromY: y,
+        toX: rect.left + (rect.width / 3) * (trayIndex + 0.5),
+        toY: rect.top + rect.height / 2,
+        start: performance.now()
+      };
     }
+  }
+
+  function setDragCanvasCenter(piece, cx, cy) {
+    const cs = state.cellSize;
+    const left = cx - (piece.cols * cs) / 2;
+    const top = cy - (piece.rows * cs) / 2;
+    dom.dragCanvas.style.transform = `translate3d(${left.toFixed(1)}px, ${top.toFixed(1)}px, 0)`;
+  }
+
+  function finishReturnAnim() {
+    state.returning = null;
+    state.trayDirty = true;
+    if (!state.dragging) syncDragCanvasTransform();
+  }
+
+  function updateReturnAnim(now) {
+    const ret = state.returning;
+    if (!ret) return;
+    const t = Math.min(1, (now - ret.start) / RETURN_ANIM_MS);
+    const ease = 1 - Math.pow(1 - t, 3); // yavaşlayarak dur
+    setDragCanvasCenter(
+      ret.piece,
+      ret.fromX + (ret.toX - ret.fromX) * ease,
+      ret.fromY + (ret.toY - ret.fromY) * ease
+    );
+    if (t >= 1) finishReturnAnim();
   }
 
   function handleBoardPointerDown(e) {
@@ -3989,12 +4048,12 @@
       : typeof navigator.vibrate === "function"
       ? "navigator.vibrate"
       : "yok";
-    debugPanel.el.textContent = [
+    debugPanel.textEl.textContent = [
       `sürüm ${APP_VERSION || "?"}  ·  ${iosMatch ? `iOS ${iosMatch[1]}.${iosMatch[2]}` : "iOS değil"}`,
       `ekran: ${debugPanel.frames.length} kare/sn  (en kötü ${worst.toFixed(0)} ms)`,
       `dokunma: ${debugPanel.moves.length} hareket/sn`,
       `olay→kare: ${medianDelay.toFixed(1)} ms (medyan)`,
-      `dpr ${window.devicePixelRatio || 1}  ·  hız x${DRAG_SPEED_TOUCH}`,
+      `dpr ${window.devicePixelRatio || 1}  ·  hız x${dragFeel.speed.toFixed(2)}  ·  kaldırma ${dragFeel.liftCells.toFixed(1)} kare`,
       `titreşim: ${hapticMode}`,
       `sürükleme tık: ${dragHaptic.crossed} / ${dragHaptic.requested} istek`
     ].join("\n");
@@ -4011,8 +4070,60 @@
     if (on && !debugPanel.el) {
       const el = document.createElement("div");
       el.className = "debug-panel";
+      const textEl = document.createElement("div");
+      el.appendChild(textEl);
+
+      // Sürükleme hissi ayarı: telefonda oynarken canlı değiştir, değer bu cihaza kaydedilir
+      const controls = document.createElement("div");
+      controls.className = "debug-controls";
+      const saveFeel = () => safeStorage.setItem(STORAGE_KEY_FEEL, JSON.stringify(dragFeel));
+      const addRow = (label, onMinus, onPlus) => {
+        const row = document.createElement("div");
+        const minus = document.createElement("button");
+        minus.type = "button";
+        minus.textContent = "−";
+        const plus = document.createElement("button");
+        plus.type = "button";
+        plus.textContent = "+";
+        const span = document.createElement("span");
+        span.textContent = label;
+        minus.addEventListener("click", () => {
+          onMinus();
+          saveFeel();
+        });
+        plus.addEventListener("click", () => {
+          onPlus();
+          saveFeel();
+        });
+        row.append(minus, span, plus);
+        controls.appendChild(row);
+      };
+      const round2 = (v) => Math.round(v * 100) / 100;
+      addRow(
+        "hız",
+        () => (dragFeel.speed = Math.max(0.8, round2(dragFeel.speed - 0.05))),
+        () => (dragFeel.speed = Math.min(2.5, round2(dragFeel.speed + 0.05)))
+      );
+      addRow(
+        "kaldırma",
+        () => (dragFeel.liftCells = Math.max(0, round2(dragFeel.liftCells - 0.1))),
+        () => (dragFeel.liftCells = Math.min(4, round2(dragFeel.liftCells + 0.1)))
+      );
+      const reset = document.createElement("button");
+      reset.type = "button";
+      reset.className = "debug-reset";
+      reset.textContent = "varsayılana dön";
+      reset.addEventListener("click", () => {
+        dragFeel.speed = DRAG_SPEED_TOUCH_DEFAULT;
+        dragFeel.liftCells = LIFT_CELLS_TOUCH_DEFAULT;
+        saveFeel();
+      });
+      controls.appendChild(reset);
+      el.appendChild(controls);
+
       document.body.appendChild(el);
       debugPanel.el = el;
+      debugPanel.textEl = textEl;
     }
     if (debugPanel.el) debugPanel.el.style.display = on ? "block" : "none";
   }

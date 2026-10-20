@@ -1801,3 +1801,37 @@ dialog::backdrop {
   white-space: pre;
   pointer-events: none;
 }
+
+.debug-controls {
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  pointer-events: auto;
+}
+
+.debug-controls > div {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.debug-controls span {
+  min-width: 56px;
+  text-align: center;
+}
+
+.debug-controls button {
+  min-width: 30px;
+  height: 26px;
+  border: 1px solid #7CFC9A;
+  border-radius: 6px;
+  background: rgba(124, 252, 154, 0.12);
+  color: #7CFC9A;
+  font: 700 14px/1 ui-monospace, Menlo, monospace;
+}
+
+.debug-controls .debug-reset {
+  font-size: 10px;
+  height: 22px;
+}
