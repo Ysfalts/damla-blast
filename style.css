@@ -809,6 +809,48 @@ body {
   animation: boardShake 0.38s cubic-bezier(0.36, 0.07, 0.19, 0.97);
 }
 
+/* Kombo sürerken tahta çevresinde yanıp sönen nokta ışıklar (Block Blast gibi) */
+.board-frame::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: 24px;
+  border: 3px dotted transparent;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+
+.board-frame.combo-active::after {
+  opacity: 1;
+  border-color: #b8f7a1;
+  filter: drop-shadow(0 0 4px rgba(184, 247, 161, 0.9));
+  animation: comboLights 0.8s steps(2) infinite;
+}
+
+.board-frame.combo-hot::after {
+  border-width: 4px;
+  filter: drop-shadow(0 0 6px rgba(255, 133, 162, 0.95));
+  animation: comboLightsHot 0.45s steps(2) infinite;
+}
+
+@keyframes comboLights {
+  0% { border-color: #b8f7a1; }
+  50% { border-color: #ffe169; }
+}
+
+@keyframes comboLightsHot {
+  0% { border-color: #ff85a2; }
+  50% { border-color: #ffe169; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .board-frame.combo-active::after,
+  .board-frame.combo-hot::after {
+    animation: none;
+  }
+}
+
 #board-canvas {
   display: block;
   border-radius: 12px;
@@ -851,6 +893,24 @@ body {
   color: var(--gold);
   text-shadow: 0 4px 0 #7a4100, 0 8px 18px rgba(0, 0, 0, 0.8);
   margin-top: 4px;
+}
+
+/* Sade kombo gösterisi: yalnızca "KOMBO N!" yazısı */
+.combo-showcase.compact .combo-head-burst,
+.combo-showcase.compact .combo-sub-text {
+  display: none;
+}
+
+/* Kombo büyüdükçe yazı büyür ve renklenir */
+.combo-showcase.combo-l2 .combo-title-text {
+  font-size: 2.4rem;
+  color: #ffe169;
+}
+
+.combo-showcase.combo-l3 .combo-title-text {
+  font-size: 2.8rem;
+  color: #ff85a2;
+  text-shadow: 0 4px 0 #7a1033, 0 0 22px rgba(255, 133, 162, 0.9), 0 8px 18px rgba(0, 0, 0, 0.8);
 }
 
 .combo-sub-text {

@@ -1306,8 +1306,10 @@
   }
 
   // 5. Madde: Tahta Üstü Çizgi Roman Konuşma Balonu Oluşturucu
-  function spawnFloatingComicText(text, x, y, color = "#ffcc29") {
+  // style: "bubble" (kutulu çizgi roman balonu), "score" (uçan +puan), "banner" (büyük özel yazı)
+  function spawnFloatingComicText(text, x, y, color = "#ffcc29", style = "bubble") {
     state.floatingTexts.push({
+      style,
       text,
       x: Math.max(70, Math.min(state.boardPixelSize - 70, x)),
       y: Math.max(40, Math.min(state.boardPixelSize - 30, y)),
@@ -1321,6 +1323,13 @@
   // ============================================================================
   // TAHTA YERLEŞTİRME, SATIR PATLATMA & ÖZEL GÜÇLÜ BLOK ETKİLERİ (3. Madde)
   // ============================================================================
+  // Kombo ve özel durum ayarları (dengelemek için tek yer)
+  const COMBO_GRACE_MOVES = 3; // bu kadar hamle üst üste satır patlamazsa kombo biter
+  const COMBO_STEP = 0.2; // her kombo adımı satır puanına +%20
+  const COMBO_MAX_MULT = 4; // en fazla x4
+  const PERFECT_CLEAR_BONUS = 500; // tahta tamamen temizlenince
+  const ESCAPE_FILL_RATIO = 0.75; // patlamadan önce bu kadar doluysa "son anda kurtuldun"
+
   function placePieceOnBoard(trayIndex, startR, startC) {
     const piece = state.tray[trayIndex];
     if (!piece) return false;
@@ -1359,8 +1368,10 @@
       state.noClearMoves = 0;
       clearLinesAndCelebrate(fullRows, fullCols, totalLines);
     } else {
-      state.streak = 0;
+      // Block Blast gibi: kombo, satır patlatmayan ilk hamlede değil, COMBO_GRACE_MOVES
+      // hamle üst üste patlatma olmazsa biter
       state.noClearMoves++;
+      if (state.noClearMoves >= COMBO_GRACE_MOVES) state.streak = 0;
       updateStreakBadge();
 
       const occupancy = getBoardOccupancyRatio();
@@ -1426,6 +1437,8 @@
   }
 
   function clearLinesAndCelebrate(fullRows, fullCols, totalLines) {
+    // "Son anda kurtuldun" için patlamadan önceki doluluk
+    const fillBeforeClear = getBoardOccupancyRatio();
     const toClearMap = new Map();
 
     fullRows.forEach((r) => {
@@ -1513,18 +1526,48 @@
       spawnFloatingComicText("😭 TRİP ÇÖZÜLDÜ +150!", centerX, centerY - 35, "#ff477e");
     }
 
-    // Genel Çizgi Roman Balonu (5. Madde)
-    if (triggeredEvents.size === 0) {
-      const popups = config.comicPopups || ["ŞAAAK! 💥", "YİNE HAKLISIN! 👑"];
-      const popupText = popups[Math.floor(Math.random() * popups.length)];
-      spawnFloatingComicText(popupText, centerX, centerY);
+    // Tahta tamamen boşaldı mı (gym etkisi dahil)?
+    const perfectClear = state.board.every((row) => row.every((cell) => cell === null));
+
+    // Puan Hesaplama: satır puanı kombo çarpanıyla büyür
+    const baseLineScore = totalLines * 100 * totalLines;
+    const comboMult = Math.min(COMBO_MAX_MULT, 1 + COMBO_STEP * Math.max(0, state.streak - 1));
+    const faceBonus = faceClearedCount * 35;
+    const gained =
+      Math.round(baseLineScore * comboMult) +
+      faceBonus +
+      eventBonusScore +
+      (perfectClear ? PERFECT_CLEAR_BONUS : 0);
+    addScore(gained);
+
+    // Yazı yerleşimi: balon patlayan satırda, uçan puan hemen altında, özel yazı tahtanın öbür yarısında
+    const size = state.boardPixelSize;
+    const textY = Math.max(40, Math.min(size - 72, centerY));
+    const bannerY = centerY < size / 2 ? size * 0.82 : size * 0.18;
+    spawnFloatingComicText(`+${gained.toLocaleString("tr-TR")}`, centerX, textY + 36, "#ffcc29", "score");
+
+    // Nadir durumlar için özel büyük yazılar
+    const special = config.specialPopups || {};
+    const pickText = (arr, fallback) => (Array.isArray(arr) && arr.length ? arr[Math.floor(Math.random() * arr.length)] : fallback);
+    let bannerShown = false;
+    if (perfectClear) {
+      spawnConfettiBurst(140);
+      sfx.playFanfare();
+      bannerShown = true; // büyük "TAHTA TERTEMİZ" gösterisi var
+    } else if (fillBeforeClear >= ESCAPE_FILL_RATIO) {
+      spawnFloatingComicText(pickText(special.escape, "SON ANDA KURTULDUN! 😱"), size / 2, bannerY, "#7bf1cc", "banner");
+      bannerShown = true;
+    } else if (totalLines >= 3) {
+      spawnFloatingComicText(pickText(special.bigClear, "METEHAN ŞOKTA! 🤯"), size / 2, bannerY, "#ff85a2", "banner");
+      bannerShown = true;
     }
 
-    // Puan Hesaplama
-    const baseLineScore = totalLines * 100 * totalLines;
-    const streakBonus = state.streak > 1 ? state.streak * 60 : 0;
-    const faceBonus = faceClearedCount * 35;
-    addScore(baseLineScore + streakBonus + faceBonus + eventBonusScore);
+    // Genel Çizgi Roman Balonu (5. Madde): özel yazı yoksa ve güçlü blok balonu çıkmadıysa
+    if (!bannerShown && triggeredEvents.size === 0) {
+      const popups = config.comicPopups || ["ŞAAAK! 💥", "YİNE HAKLISIN! 👑"];
+      const popupText = popups[Math.floor(Math.random() * popups.length)];
+      spawnFloatingComicText(popupText, centerX, textY);
+    }
 
     sfx.playClear(totalLines, state.streak);
     updateStreakBadge();
@@ -1533,7 +1576,10 @@
     let quote = specialQuote;
     let targetMood = specialMood || "love";
 
-    if (!quote) {
+    if (perfectClear) {
+      quote = quoteDeck.pick("perfectClear", ["Tahtayı tertemiz yaptın canım, Metehan şokta! 🎂"]);
+      targetMood = "king";
+    } else if (!quote) {
       if (totalLines >= 3 || state.streak >= 3) {
         quote = quoteDeck.pick("clear3Plus");
         targetMood = "king";
@@ -1550,16 +1596,27 @@
       setManitaMood(targetMood, quote);
     }
 
-    if (totalLines >= 2 || state.streak >= 2 || triggeredEvents.size > 0) {
+    if (perfectClear || totalLines >= 2 || state.streak >= 2 || triggeredEvents.size > 0) {
       triggerBoardShake();
-      const title =
-        totalLines >= 2
-          ? `COMBO x${totalLines}!`
-          : state.streak >= 2
-          ? `SERİ x${state.streak}!`
-          : `ÖZEL METEHAN ŞOV! 💥`;
-      showComboShowcase(title, quote, targetMood);
+      const title = perfectClear
+        ? "TAHTA TERTEMİZ! 🎂"
+        : state.streak >= 2
+        ? `KOMBO ${state.streak}!`
+        : totalLines >= 2
+        ? `${totalLines} SATIR!`
+        : `ÖZEL METEHAN ŞOV! 💥`;
+      // Yalnızca kombo yüzünden açılıyorsa sade göster (yüz/alt yazı yok), tahta ve uçan puan görünsün
+      const compact = !perfectClear && totalLines < 2 && triggeredEvents.size === 0;
+      showComboShowcase(title, quote, targetMood, perfectClear ? 3 : comboLevel(state.streak), compact);
     }
+  }
+
+  // Kombo görsel seviyesi: 0 yok, 1 (2-4), 2 (5-9), 3 (10+)
+  function comboLevel(streak) {
+    if (streak >= 10) return 3;
+    if (streak >= 5) return 2;
+    if (streak >= 2) return 1;
+    return 0;
   }
 
   function triggerBoardShake() {
@@ -1569,8 +1626,11 @@
   }
 
   let comboTimer = null;
-  function showComboShowcase(title, subtitle, avatarMood = "love") {
+  function showComboShowcase(title, subtitle, avatarMood = "love", level = 0, compact = false) {
     avatarMood = resolveUnlockedMood(avatarMood);
+    dom.comboShowcase.classList.toggle("compact", compact);
+    dom.comboShowcase.classList.remove("combo-l1", "combo-l2", "combo-l3");
+    if (level > 0) dom.comboShowcase.classList.add(`combo-l${level}`);
     dom.comboTitleText.textContent = title;
     dom.comboSubText.textContent = subtitle;
     dom.comboShowcase.classList.remove("hidden");
@@ -1873,11 +1933,14 @@
 
   function updateStreakBadge() {
     if (state.streak >= 2) {
-      dom.uiStreakBadge.textContent = `🔥 SERİ x${state.streak}`;
+      dom.uiStreakBadge.textContent = `🔥 KOMBO x${state.streak}`;
       dom.uiStreakBadge.classList.remove("hidden");
     } else {
       dom.uiStreakBadge.classList.add("hidden");
     }
+    // Kombo sürerken tahta çevresinde nokta ışıklar (Block Blast gibi); bitince söner
+    dom.boardFrame.classList.toggle("combo-active", state.streak >= 2);
+    dom.boardFrame.classList.toggle("combo-hot", state.streak >= 5);
   }
 
   function updateJokerButtons() {
@@ -2813,6 +2876,22 @@
       ctx.translate(ft.x, ft.y);
       ctx.scale(ft.scale, ft.scale);
 
+      if (ft.style === "score" || ft.style === "banner") {
+        // Kutusuz, konturlu büyük yazı: uçan "+puan" veya özel durum yazısı
+        const size = ft.style === "score" ? Math.round(state.cellSize * 0.62) : Math.round(state.cellSize * 0.5);
+        ctx.font = `900 ${size}px 'Fredoka', 'Nunito', sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.lineJoin = "round";
+        ctx.lineWidth = Math.max(3, size * 0.16);
+        ctx.strokeStyle = "rgba(40, 8, 30, 0.9)";
+        ctx.strokeText(ft.text, 0, 0);
+        ctx.fillStyle = ft.color;
+        ctx.fillText(ft.text, 0, 0);
+        ctx.restore();
+        continue;
+      }
+
       ctx.font = "900 16px 'Fredoka', 'Nunito', sans-serif";
       const textW = ctx.measureText(ft.text).width;
       const boxW = textW + 20;
@@ -3234,11 +3313,12 @@
   // Sürükleme hız çarpanı: 1.0 = blok parmakla birebir (1:1) hareket eder.
   // Gerçek Block Blast'taki gibi dokunmatikte blok parmaktan biraz hızlı gider; parmak az
   // hareket ederken blok tahtaya çabuk ulaşır. Hissiyat ayarı için yalnızca bu sabitler yeterli.
-  const DRAG_SPEED_TOUCH_DEFAULT = 1.3;
+  // Yusuf'un telefonda test panelinden bulduğu değerler (hız 2.2, kaldırma 1.1)
+  const DRAG_SPEED_TOUCH_DEFAULT = 2.2;
   const DRAG_SPEED_MOUSE = 1.0;
-  // Block Blast videosundan ölçüldü: alınan bloğun merkezi parmağın ~2,3 tahta karesi yukarısında
-  // durur (iki farklı yükseklikteki parçada da ~107-110 pt, kare 47 pt). Parmak bloğu kapatmaz.
-  const LIFT_CELLS_TOUCH_DEFAULT = 2.3;
+  // Block Blast videosunda alınan bloğun merkezi parmağın ~2,3 tahta karesi yukarısında duruyordu
+  // (~107-110 pt, kare 47 pt); hız 2.2 ile birlikte telefonda en iyi his 1,1 karede bulundu.
+  const LIFT_CELLS_TOUCH_DEFAULT = 1.1;
   const STORAGE_KEY_FEEL = "damla_blast_drag_feel_v1";
   // Test panelinden telefonda canlı ayarlanabilir; ayar o cihaza kaydedilir
   const dragFeel = { speed: DRAG_SPEED_TOUCH_DEFAULT, liftCells: LIFT_CELLS_TOUCH_DEFAULT };
@@ -4102,7 +4182,7 @@
       addRow(
         "hız",
         () => (dragFeel.speed = Math.max(0.8, round2(dragFeel.speed - 0.05))),
-        () => (dragFeel.speed = Math.min(2.5, round2(dragFeel.speed + 0.05)))
+        () => (dragFeel.speed = Math.min(3, round2(dragFeel.speed + 0.05)))
       );
       addRow(
         "kaldırma",

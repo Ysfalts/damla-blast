@@ -238,6 +238,12 @@ window.DAMLA_CONFIG = {
       "Güllerimle geldim, 3x3 alanı senin için tertemiz yaptım! ❤️",
       "Hemen açıyorum orayı, yeter ki sen sinirlenme!"
     ],
+    // Tahta tamamen temizlenince
+    perfectClear: [
+      "Tahtayı tertemiz yaptın canım, Metehan şokta! 🎂",
+      "Tek blok bile bırakmadın bitanem, bu nasıl bir yetenek?! ✨",
+      "Pırıl pırıl tahta! Doğum günü kızına yakışır 👑"
+    ],
     rerollUsed: [
       "Ben hallederim canım! Gözlüğümü taktım, o zor blokları kovdum 😎",
       "Mercedes konforunda 1x1 lokum gibi bloklar getirdim sana!",
@@ -256,6 +262,14 @@ window.DAMLA_CONFIG = {
     "KRALİÇE HAREKETİ! ✨",
     "METEHAN ŞOK! 🤯"
   ],
+
+  // 7B. NADİR DURUMLARDA TAHTA ÜSTÜNDE ÇIKAN BÜYÜK YAZILAR
+  specialPopups: {
+    // Tek hamlede 3 veya daha fazla satır/sütun
+    bigClear: ["METEHAN ŞOKTA! 🤯", "BU NE ZEKA?! 🧠", "EFSANE HAMLE! 🔥"],
+    // Tahta neredeyse doluyken patlatınca
+    escape: ["SON ANDA KURTULDUN! 😱", "KIL PAYI! 😮‍💨", "METEHAN NEFES ALDI! 🙏"]
+  },
 
   // 8. DOĞUM GÜNÜ TORPİLİ (Yanmama Garantisi Ekranı)
   torpil: {
