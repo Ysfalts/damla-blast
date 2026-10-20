@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#131936" />
+  <title>Damla Blast 👑 Doğum Günü Özel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=4" />
+</head>
+<body>
+  <div id="app-shell" class="app-shell">
+    <!-- ARKA PLAN EFEKT KATMANI -->
+    <div class="bg-decorations" aria-hidden="true">
+      <span class="bg-orb orb-1"></span>
+      <span class="bg-orb orb-2"></span>
+      <span class="bg-orb orb-3"></span>
+    </div>
+
+    <!-- =====================================================================
+         1. GİRİŞ EKRANI (SPLASH & SAHTE REKOR TABLOSU)
+         ===================================================================== -->
+    <section id="start-screen" class="start-screen active" aria-label="Giriş Ekranı">
+      <div class="start-card">
+        <div class="birthday-pill" id="ui-birthday-pill">🎂 İYİ Kİ DOĞDUN DAMLA! 🎂</div>
+        
+        <div class="logo-wrap">
+          <h1 class="game-logo">
+            <span class="logo-top">DAMLA</span>
+            <span class="logo-bottom">BLAST!</span>
+          </h1>
+          <div class="logo-sub">Metehan Patlatma &amp; Haklı Çıkma Simülatörü</div>
+        </div>
+
+        <!-- Maskot Önizleme -->
+        <div class="hero-mascot-box">
+          <div class="hero-avatar-ring" id="start-avatar-ring">
+            <canvas id="hero-avatar-canvas" width="136" height="136"></canvas>
+            <span class="hero-floating-badge">💐</span>
+          </div>
+          <div class="hero-quote" id="start-hero-quote">
+            "Doğum günün kutlu olsun aşkım! Puan kastıkça cüzdanım eriyor ve yeni yüzlerim açılıyor ❤️"
+          </div>
+        </div>
+
+        <!-- Sahte Rekor Tablosu -->
+        <div class="leaderboard-card">
+          <div class="leaderboard-title">🏆 DÜNYA GENELİ REKOR TABLOSU</div>
+          <div id="leaderboard-list" class="leaderboard-list">
+            <!-- JS ile doldurulur -->
+          </div>
+        </div>
+
+        <div class="start-actions">
+          <button id="btn-start-game" class="btn-primary btn-play" type="button">
+            <span>HEMEN OYNA</span>
+            <span class="btn-icon">👑</span>
+          </button>
+          <button id="btn-open-settings-start" class="btn-secondary" type="button">
+            ⚙️ Fotoğraf &amp; İsim Özelleştir
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         2. ANA OYUN EKRANI
+         ===================================================================== -->
+    <main id="game-screen" class="game-screen" aria-label="Oyun Alanı">
+      <!-- Üst Skor & Kontroller Barı -->
+      <header class="top-bar">
+        <div class="score-pill best-score-pill" title="En Yüksek Skor">
+          <span class="pill-icon">👑</span>
+          <div class="pill-text">
+            <span class="pill-label">REKOR</span>
+            <span id="ui-best-score" class="pill-val">0</span>
+          </div>
+        </div>
+
+        <div class="current-score-box">
+          <div id="ui-current-score" class="main-score">0</div>
+          <div id="ui-streak-badge" class="streak-badge hidden">🔥 SERİ x2</div>
+        </div>
+
+        <div class="top-controls">
+          <button id="btn-open-collection" class="icon-btn" type="button" title="Metehan Koleksiyonu & Cüzdan Durumu">
+            🃏
+          </button>
+          <button id="btn-gift-coupon" class="icon-btn gift-btn" type="button" title="Doğum Günü Hediyesi">
+            🎁
+            <span id="gift-lock-dot" class="gift-dot"></span>
+          </button>
+          <button id="btn-sound-toggle" class="icon-btn" type="button" title="Ses Aç/Kapat">
+            🔊
+          </button>
+          <button id="btn-open-settings" class="icon-btn" type="button" title="Fotoğraf & Ayarlar">
+            ⚙️
+          </button>
+        </div>
+      </header>
+
+      <!-- METEHAN'IN CÜZDANI & KARAKTER KATLAMA BARI (4. Madde - Alternatif D) -->
+      <div class="goal-progress-wrap" id="goal-progress-wrap" title="Detaylar için dokun!">
+        <div class="goal-progress-labels">
+          <span id="ui-goal-label">💸 Cüzdan: ☕ Kahve Hedefi</span>
+          <span id="ui-goal-numbers" class="goal-reward-pill">0 / 300 Puan</span>
+        </div>
+        <div class="goal-progress-track">
+          <div id="ui-goal-fill" class="goal-progress-fill" style="width: 0%"></div>
+          <!-- Aşama Çentikleri: 300 (20%), 650 (43%), 1050 (70%), 1500 (100%) -->
+          <span class="tier-tick" style="left: 20%" title="300 Puan: Kahve + Gym Metehan">☕</span>
+          <span class="tier-tick" style="left: 43%" title="650 Puan: Tatlı + Mangalcı Metehan">🍰</span>
+          <span class="tier-tick" style="left: 70%" title="1050 Puan: Yemek + Ağlayan Metehan">🍽️</span>
+          <span class="tier-tick" style="left: 97%" title="1500 Puan: VIP Kupon + Kral Metehan">👑</span>
+        </div>
+      </div>
+
+      <!-- CANLI MANİTA AVATARI & KONUŞMA BALONU -->
+      <section class="manita-live-bar" id="manita-live-bar">
+        <div class="manita-avatar-wrapper" id="manita-avatar-wrapper" title="Metehan'a dokun!">
+          <canvas id="live-avatar-canvas" width="112" height="112"></canvas>
+          <div id="avatar-mood-emoji" class="avatar-mood-emoji">😍</div>
+        </div>
+        <div class="speech-bubble-wrap">
+          <div class="speech-header">
+            <span id="ui-boyfriend-name" class="speech-name">Metehan</span>
+            <span id="ui-mood-tag" class="speech-mood-tag mood-happy">Aşık &amp; İtaatkar</span>
+            <span id="ui-wallet-badge" class="wallet-mini-badge">💸 Cüzdan Rahat</span>
+          </div>
+          <p id="ui-speech-text" class="speech-text">
+            İyi ki doğdun Damla'm! Bugün bütün bloklar sana feda ❤️
+          </p>
+        </div>
+      </section>
+
+      <!-- 8x8 OYUN TAHTASI & EFEKT KATMANI -->
+      <div class="board-stage" id="board-stage">
+        <div id="bomb-mode-banner" class="bomb-mode-banner hidden">
+          <span>💐 Patlatmak istediğin 3x3 alana dokun!</span>
+          <button id="btn-cancel-bomb" type="button">İptal</button>
+        </div>
+
+        <!-- Yeni Karakter / Ödül Katlama Bildirim Kartı -->
+        <div id="tier-unlock-toast" class="tier-unlock-toast hidden" aria-live="polite">
+          <canvas id="toast-avatar-canvas" width="68" height="68"></canvas>
+          <div class="toast-text-col">
+            <span id="toast-title" class="toast-title">🔓 YENİ METEHAN AÇILDI!</span>
+            <span id="toast-desc" class="toast-desc">💪 Gym Bro Metehan &amp; ☕ Kahve Borcu!</span>
+          </div>
+        </div>
+
+        <div class="board-frame" id="board-frame">
+          <canvas id="board-canvas"></canvas>
+
+          <!-- Büyük Kombo / Uçan Kafa Gösterisi -->
+          <div id="combo-showcase" class="combo-showcase hidden" aria-live="polite">
+            <div class="combo-head-burst" id="combo-head-burst">
+              <canvas id="combo-avatar-canvas" width="140" height="140"></canvas>
+            </div>
+            <div id="combo-title-text" class="combo-title-text">COMBO x2!</div>
+            <div id="combo-sub-text" class="combo-sub-text">YİNE SEN HAKLI ÇIKTIN!</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3'LÜ BLOK TEPSİSİ (DRAG & DROP TRAY) -->
+      <div class="tray-container" id="tray-container">
+        <canvas id="tray-canvas"></canvas>
+      </div>
+
+      <!-- ALT BAR: KURTARICI JOKER BUTONLARI -->
+      <footer class="joker-bar">
+        <button id="btn-joker-bomb" class="joker-btn joker-bomb" type="button">
+          <img src="assets/faces/metehan_sorry.jpg" alt="Özür Dileyen Metehan" class="joker-avatar-img" />
+          <div class="joker-info">
+            <span class="joker-title">Özür Dilerim Haklısın</span>
+            <span class="joker-desc">💐 3x3 Alanı Patlatır</span>
+          </div>
+          <span id="badge-bomb-count" class="joker-count">2</span>
+        </button>
+
+        <button id="btn-joker-reroll" class="joker-btn joker-reroll" type="button">
+          <img src="assets/faces/metehan_cool.jpg" alt="Cool Metehan" class="joker-avatar-img" />
+          <div class="joker-info">
+            <span class="joker-title">Ben Hallederim Aşkım</span>
+            <span class="joker-desc">😎 1x1 Kolay Blok Verir</span>
+          </div>
+          <span id="badge-reroll-count" class="joker-count">2</span>
+        </button>
+      </footer>
+    </main>
+
+    <!-- Sürükleme Sırasında Tüm Ekran Üzerinde Hareket Eden Katman -->
+    <canvas id="drag-canvas" class="drag-canvas"></canvas>
+
+    <!-- =====================================================================
+         3. MODAL PENCERELER (<dialog>)
+         ===================================================================== -->
+
+    <!-- A. DOĞUM GÜNÜ TORPİLİ (YANMAMA GARANTİSİ) -->
+    <dialog id="dialog-torpil" class="game-dialog torpil-dialog">
+      <div class="dialog-card">
+        <div id="torpil-badge" class="dialog-pill pill-danger">🚨 KANUNİ UYARI 🚨</div>
+        <div class="dialog-avatar-box">
+          <canvas id="torpil-avatar-canvas" width="128" height="128"></canvas>
+          <span class="dialog-avatar-badge">💐</span>
+        </div>
+        <h2 id="torpil-title" class="dialog-title">Doğum Günü Torpili!</h2>
+        <p id="torpil-message" class="dialog-desc">
+          Doğum günü kızının bu oyunda yenilmesi kanunen yasaktır! Tahtanın ortasını senin için tertemiz yapayım mı?
+        </p>
+        <div class="dialog-actions">
+          <button id="btn-accept-torpil" class="btn-primary btn-glow" type="button">
+            Tabii ki, ben hep haklıyım 👑
+          </button>
+          <button id="btn-decline-torpil" class="btn-ghost" type="button">
+            Yok canım, skorum yetti (Bitir)
+          </button>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- B. DOĞUM GÜNÜ SÜRPRİZİ & ÖDÜL KUPONU -->
+    <dialog id="dialog-coupon" class="game-dialog coupon-dialog">
+      <div class="dialog-card coupon-card-wrap">
+        <div id="coupon-badge" class="dialog-pill pill-gold">🎉 HEDEF SKOR GEÇİLDİ! 🎉</div>
+        <div class="dialog-avatar-box">
+          <canvas id="coupon-avatar-canvas" width="128" height="128"></canvas>
+          <span class="dialog-avatar-badge">🎂</span>
+        </div>
+        <h2 id="coupon-title" class="dialog-title">İYİ Kİ DOĞDUN DAMLA! 🎂</h2>
+        <p id="coupon-subtitle" class="dialog-desc">
+          Metehan'ı ve tüm blokları başarıyla patlattın!
+        </p>
+
+        <!-- Kupon Kartı -->
+        <div class="reward-ticket">
+          <div id="coupon-header" class="ticket-header">🎁 METEHAN'DAN VIP DOĞUM GÜNÜ KUPONU</div>
+          <div id="coupon-body" class="ticket-body"></div>
+          <div class="ticket-footer">
+            <span id="coupon-stamp" class="ticket-stamp">METEHAN ONAYLI • İTİRAZ EDİLEMEZ</span>
+          </div>
+        </div>
+
+        <div class="dialog-actions">
+          <button id="btn-close-coupon" class="btn-primary" type="button">
+            Kuponu Cebe At &amp; Sonsuz Moda Devam Et 🚀
+          </button>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- C. OYUN SONU (EĞER TORPİLİ REDDEDERSE) -->
+    <dialog id="dialog-gameover" class="game-dialog">
+      <div class="dialog-card">
+        <div class="dialog-pill">OYUN BİTTİ</div>
+        <div class="dialog-avatar-box">
+          <canvas id="gameover-avatar-canvas" width="120" height="120"></canvas>
+        </div>
+        <h2 class="dialog-title">Beni Yine Harcadın... ❤️</h2>
+        <p class="dialog-desc" id="gameover-quote">
+          "Doğum günün diye bilerek kaybettim, yoksa kesin rekor kırardın aşkım!"
+        </p>
+        <div class="gameover-score-panel">
+          <div>
+            <span>SKORUN</span>
+            <strong id="gameover-final-score">0</strong>
+          </div>
+          <div>
+            <span>EN YÜKSEK</span>
+            <strong id="gameover-best-score">0</strong>
+          </div>
+        </div>
+        <div class="dialog-actions">
+          <button id="btn-restart-game" class="btn-primary" type="button">
+            Tekrar Patlat 🔄
+          </button>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- D. METEHAN KOLEKSİYONU & CÜZDAN KATLAMA REHBERİ (Yeni!) -->
+    <dialog id="dialog-collection" class="game-dialog collection-dialog">
+      <div class="dialog-card settings-card">
+        <div class="settings-top">
+          <h2 class="dialog-title">🃏 Metehan Evreni &amp; Cüzdan</h2>
+          <button id="btn-close-collection-x" class="close-x-btn" type="button" aria-label="Kapat">✕</button>
+        </div>
+
+        <div class="event-blocks-guide">
+          <div class="guide-title">⚡ Özel Güçlü Metehan Blokları</div>
+          <div class="guide-row">
+            <span class="guide-badge">💪</span>
+            <div><strong>Gym Bro Bloğu:</strong> Patlayınca dambılla etraftaki ekstra blokları da ezer!</div>
+          </div>
+          <div class="guide-row">
+            <span class="guide-badge">🔥</span>
+            <div><strong>Mangalcı Bloğu:</strong> Patlayınca alttaki Joker haklarına +1 bedava hak ekler!</div>
+          </div>
+          <div class="guide-row">
+            <span class="guide-badge">😭</span>
+            <div><strong>Trip Bloğu:</strong> Patlatıp gönlünü alınca tam <strong>3 KAT (+150)</strong> ekstra puan verir!</div>
+          </div>
+        </div>
+
+        <div class="guide-title">💸 Puanla Katlanan Doğum Günü Hediyesi</div>
+        <div id="collection-tiers-list" class="collection-tiers-list">
+          <!-- JS ile doldurulur -->
+        </div>
+
+        <div class="guide-title">🎭 12'li Metehan Yüz Koleksiyonu</div>
+        <div id="collection-faces-grid" class="collection-faces-grid">
+          <!-- JS ile doldurulur -->
+        </div>
+
+        <div class="dialog-actions">
+          <button id="btn-close-collection" class="btn-primary" type="button">
+            Oyuna Dön 🚀
+          </button>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- E. HIZLI FOTOĞRAF VE İSİM ÖZELLEŞTİRME PANELİ -->
+    <dialog id="dialog-settings" class="game-dialog settings-dialog">
+      <div class="dialog-card settings-card">
+        <div class="settings-top">
+          <h2 class="dialog-title">⚙️ Manita &amp; Oyun Özelleştirme</h2>
+          <button id="btn-close-settings-x" class="close-x-btn" type="button" aria-label="Kapat">✕</button>
+        </div>
+        <p class="settings-hint">
+          Buradan ismi, hedef skoru ve kupon ödülünü anında değiştirebilirsin.
+        </p>
+
+        <div class="settings-form">
+          <label class="form-group">
+            <span>Erkek Arkadaşının Adı / Lakabı:</span>
+            <input type="text" id="input-bf-name" placeholder="Örn: Metehan" maxlength="24" />
+          </label>
+
+          <label class="form-group">
+            <span>Final Doğum Günü Kuponu Skoru:</span>
+            <input type="number" id="input-target-score" min="500" max="50000" step="100" />
+          </label>
+
+          <div class="form-group">
+            <span>Özel Tek Fotoğraf Yükle (İsteğe Bağlı):</span>
+            <div class="photo-upload-row">
+              <canvas id="settings-preview-canvas" width="76" height="76"></canvas>
+              <div class="photo-upload-btns">
+                <label class="btn-upload-label">
+                  📸 Galeriden Fotoğraf Seç
+                  <input type="file" id="input-bf-photo" accept="image/*" hidden />
+                </label>
+                <button id="btn-reset-photo" class="btn-reset-small" type="button">
+                  12'li Metehan Paketine Dön
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <label class="form-group">
+            <span>Doğum Günü Kuponu Ödül Metni:</span>
+            <textarea id="input-coupon-text" rows="4"></textarea>
+          </label>
+        </div>
+
+        <div class="dialog-actions settings-actions">
+          <button id="btn-save-settings" class="btn-primary" type="button">
+            Kaydet ve Uygula ✅
+          </button>
+          <button id="btn-export-config" class="btn-secondary" type="button">
+            💾 Ayarları config.js Olarak İndir
+          </button>
+          <button id="btn-new-game-settings" class="btn-ghost" type="button">
+            Yeni Oyun Başlat 🔄
+          </button>
+        </div>
+      </div>
+    </dialog>
+  </div>
+
+  <script src="config.js?v=4"></script>
+  <script src="game.js?v=4"></script>
+</body>
+</html>
