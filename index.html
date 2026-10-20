@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=5" />
+  <link rel="stylesheet" href="style.css?v=6" />
 </head>
 <body>
   <div id="app-shell" class="app-shell">
@@ -196,6 +196,8 @@
 
     <!-- Sürükleme Sırasında Tüm Ekran Üzerinde Hareket Eden Katman -->
     <canvas id="drag-canvas" class="drag-canvas"></canvas>
+    <!-- Tam Ekran Doğum Günü Konfeti Yağmuru Katmanı -->
+    <canvas id="confetti-canvas" class="confetti-canvas"></canvas>
 
     <!-- =====================================================================
          3. MODAL PENCERELER (<dialog>)
@@ -247,7 +249,13 @@
         </div>
 
         <div class="dialog-actions">
-          <button id="btn-close-coupon" class="btn-primary" type="button">
+          <button id="btn-share-coupon-image" class="btn-primary btn-gold-share" type="button">
+            📸 Resmi Senedi Görsel Olarak Paylaş / İndir
+          </button>
+          <button id="btn-whatsapp-coupon" class="btn-whatsapp" type="button">
+            💬 WhatsApp'tan Metehan'a Kanıt Gönder
+          </button>
+          <button id="btn-close-coupon" class="btn-secondary" type="button">
             Kuponu Cebe At &amp; Sonsuz Moda Devam Et 🚀
           </button>
         </div>
@@ -384,7 +392,7 @@
     </dialog>
   </div>
 
-  <script src="config.js?v=5"></script>
-  <script src="game.js?v=5"></script>
+  <script src="config.js?v=6"></script>
+  <script src="game.js?v=6"></script>
 </body>
 </html>

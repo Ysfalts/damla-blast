@@ -155,6 +155,17 @@
       }
     }
 
+    vibrate(pattern) {
+      if (!this.enabled) return;
+      try {
+        if (window.navigator && typeof window.navigator.vibrate === "function") {
+          window.navigator.vibrate(pattern);
+        }
+      } catch (e) {
+        // iOS veya masaüstünde desteklenmiyorsa yoksay
+      }
+    }
+
     tone(freq, type, duration, vol = 0.16, delay = 0, slideTo = null) {
       if (!this.enabled) return;
       this.init();
@@ -181,11 +192,13 @@
 
     playPickup() {
       this.tone(320, "sine", 0.08, 0.14, 0, 480);
+      this.vibrate(8);
     }
 
     playPlace() {
       this.tone(190, "triangle", 0.11, 0.22, 0, 120);
       this.tone(380, "sine", 0.07, 0.1, 0.02, 440);
+      this.vibrate(14);
     }
 
     playClear(linesCount, streak) {
@@ -196,29 +209,38 @@
         this.tone(baseNotes[i] + shift, "triangle", 0.24, 0.2, i * 0.055);
         this.tone((baseNotes[i] + shift) * 1.5, "sine", 0.2, 0.08, i * 0.055);
       }
+      if (linesCount >= 2 || streak >= 2) {
+        this.vibrate([30, 25, 55, 25, 80]);
+      } else {
+        this.vibrate([22, 20, 32]);
+      }
     }
 
     playGymSmash() {
       // Güçlü dambıl basma efekti
       this.tone(110, "sawtooth", 0.28, 0.24, 0, 55);
       this.tone(220, "square", 0.18, 0.14, 0.08, 440);
+      this.vibrate([45, 25, 70]);
     }
 
     playMangalSizzle() {
       // Neşeli mangal/joker dolum sesi
       this.tone(440, "triangle", 0.12, 0.18, 0, 660);
       this.tone(660, "triangle", 0.18, 0.18, 0.1, 990);
+      this.vibrate([25, 25, 45]);
     }
 
     playCashRegister() {
       // Cüzdan ağlama / Kasa "Ka-ching!" sesi
       this.tone(987.77, "sine", 0.09, 0.2, 0);
       this.tone(1318.51, "triangle", 0.28, 0.22, 0.09);
+      this.vibrate([35, 30, 75]);
     }
 
     playBomb() {
       this.tone(160, "sawtooth", 0.35, 0.22, 0, 45);
       this.tone(587.33, "triangle", 0.22, 0.18, 0.12, 880);
+      this.vibrate([55, 30, 90]);
     }
 
     playFanfare() {
@@ -227,11 +249,13 @@
       notes.forEach((n, idx) => {
         this.tone(n, "triangle", 0.22, 0.22, times[idx]);
       });
+      this.vibrate([45, 35, 65, 35, 95, 40, 120]);
     }
 
     playAvatarBoop() {
       this.tone(440, "sine", 0.12, 0.16, 0, 660);
       this.tone(660, "sine", 0.14, 0.14, 0.09, 880);
+      this.vibrate(12);
     }
   }
 
@@ -434,6 +458,8 @@
     dragging: null,
     particles: [],
     floatingTexts: [], // 5. Madde: Tahta üstü çizgi roman balonları
+    confetti: [],      // Tam ekran doğum günü konfeti yağmuru
+    confettiActive: false,
     cellSize: 40,
     boardPixelSize: 320,
     timeSec: 0,
@@ -517,6 +543,7 @@
     trayContainer: document.getElementById("tray-container"),
     trayCanvas: document.getElementById("tray-canvas"),
     dragCanvas: document.getElementById("drag-canvas"),
+    confettiCanvas: document.getElementById("confetti-canvas"),
 
     btnJokerBomb: document.getElementById("btn-joker-bomb"),
     btnJokerReroll: document.getElementById("btn-joker-reroll"),
@@ -539,6 +566,8 @@
     couponHeader: document.getElementById("coupon-header"),
     couponBody: document.getElementById("coupon-body"),
     couponStamp: document.getElementById("coupon-stamp"),
+    btnShareCouponImage: document.getElementById("btn-share-coupon-image"),
+    btnWhatsappCoupon: document.getElementById("btn-whatsapp-coupon"),
     btnCloseCoupon: document.getElementById("btn-close-coupon"),
 
     dialogGameover: document.getElementById("dialog-gameover"),
@@ -1036,11 +1065,96 @@
     const ctx = dom.comboAvatarCanvas.getContext("2d");
     ctx.clearRect(0, 0, 140, 140);
     drawBoyfriendAvatar(ctx, 70, 70, 66, avatarMood, state.timeSec);
+    spawnConfettiBurst(38);
 
     if (comboTimer) clearTimeout(comboTimer);
     comboTimer = setTimeout(() => {
       dom.comboShowcase.classList.add("hidden");
     }, 1250);
+  }
+
+  // Tam Ekran Doğum Günü Konfeti Yağmuru Motoru (Öneri #5)
+  const CONFETTI_COLORS = ["#ffcc29", "#ff477e", "#06d6a0", "#4cc9f0", "#cba4f7", "#ffffff", "#ff9e00"];
+  function spawnConfettiBurst(count = 75) {
+    if (!dom.confettiCanvas) return;
+    const w = window.innerWidth || 390;
+    const h = window.innerHeight || 844;
+    for (let i = 0; i < count; i++) {
+      const fromSide = i % 3 !== 0;
+      const startX = fromSide ? (i % 2 === 0 ? w * 0.12 : w * 0.88) : Math.random() * w;
+      const startY = fromSide ? h * (0.22 + Math.random() * 0.25) : -20 - Math.random() * 60;
+      const vx = fromSide
+        ? (i % 2 === 0 ? 1 : -1) * (2.2 + Math.random() * 5.2) + (Math.random() - 0.5) * 2
+        : (Math.random() - 0.5) * 4;
+      const vy = fromSide ? -4.5 - Math.random() * 5.5 : 2.0 + Math.random() * 3.5;
+
+      state.confetti.push({
+        x: startX,
+        y: startY,
+        vx,
+        vy,
+        w: 7 + Math.random() * 6,
+        h: 4 + Math.random() * 5,
+        color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+        rot: Math.random() * Math.PI * 2,
+        vRot: (Math.random() - 0.5) * 0.22,
+        wobble: Math.random() * Math.PI * 2,
+        vWobble: 0.08 + Math.random() * 0.1,
+        alpha: 1
+      });
+    }
+    state.confettiActive = true;
+  }
+
+  function renderConfetti(dpr) {
+    if (!dom.confettiCanvas) return;
+    if (state.confetti.length === 0) {
+      if (state.confettiActive) {
+        const ctx = dom.confettiCanvas.getContext("2d");
+        ctx.clearRect(0, 0, dom.confettiCanvas.width, dom.confettiCanvas.height);
+        state.confettiActive = false;
+      }
+      return;
+    }
+
+    const ctx = dom.confettiCanvas.getContext("2d");
+    const w = window.innerWidth || 390;
+    const h = window.innerHeight || 844;
+    const dt = state.dt || 1;
+
+    ctx.save();
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, w, h);
+
+    for (let i = state.confetti.length - 1; i >= 0; i--) {
+      const c = state.confetti[i];
+      c.wobble += c.vWobble * dt;
+      c.x += (c.vx + Math.sin(c.wobble) * 1.1) * dt;
+      c.y += c.vy * dt;
+      c.vy = Math.min(5.2, c.vy + 0.16 * dt);
+      c.vx *= Math.pow(0.985, dt);
+      c.rot += c.vRot * dt;
+
+      if (c.y > h * 0.78) {
+        c.alpha -= 0.025 * dt;
+      }
+
+      if (c.alpha <= 0 || c.y > h + 30) {
+        state.confetti.splice(i, 1);
+        continue;
+      }
+
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, c.alpha);
+      ctx.translate(c.x, c.y);
+      ctx.rotate(c.rot);
+      ctx.scale(Math.cos(c.wobble), 1);
+      ctx.fillStyle = c.color;
+      ctx.fillRect(-c.w / 2, -c.h / 2, c.w, c.h);
+      ctx.restore();
+    }
+
+    ctx.restore();
   }
 
   // ============================================================================
@@ -1144,6 +1258,7 @@
 
       if (newlyReached) {
         sfx.playCashRegister();
+        spawnConfettiBurst(85);
         const unlockedFaceKey =
           (newlyReached.unlockedFaces && newlyReached.unlockedFaces[0]) || "broke";
         setManitaMood("broke", newlyReached.quote);
@@ -1376,6 +1491,7 @@
 
   function openCouponModal() {
     sfx.playFanfare();
+    spawnConfettiBurst(120);
     const ctx = dom.couponAvatarCanvas.getContext("2d");
     ctx.clearRect(0, 0, 128, 128);
     drawBoyfriendAvatar(ctx, 64, 64, 60, "king", state.timeSec);
@@ -1393,6 +1509,227 @@
     if (!dom.dialogCoupon.open) {
       dom.dialogCoupon.showModal();
     }
+  }
+
+  // ============================================================================
+  // RESMİ DOĞUM GÜNÜ SENEDİ GÖRSEL ÜRETİCİ & WHATSAPP PAYLAŞIM (Öneri #1)
+  // ============================================================================
+  function wrapCanvasLines(ctx, text, maxWidth) {
+    const words = String(text || "").split(/\s+/);
+    const lines = [];
+    let current = "";
+    words.forEach((word) => {
+      const test = current ? `${current} ${word}` : word;
+      if (ctx.measureText(test).width > maxWidth && current) {
+        lines.push(current);
+        current = word;
+      } else {
+        current = test;
+      }
+    });
+    if (current) lines.push(current);
+    return lines;
+  }
+
+  function renderOfficialCouponCardCanvas() {
+    const W = 1080;
+    const H = 1350;
+    const card = document.createElement("canvas");
+    card.width = W;
+    card.height = H;
+    const ctx = card.getContext("2d");
+
+    // 1. Kraliyet Gece Mavisi & Altın Lüks Arka Plan
+    const bg = ctx.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0, "#1c2759");
+    bg.addColorStop(0.5, "#111738");
+    bg.addColorStop(1, "#090d24");
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    // Dekoratif Çift Katmanlı Altın Çerçeve
+    ctx.strokeStyle = "#ffcc29";
+    ctx.lineWidth = 8;
+    roundRect(ctx, 36, 36, W - 72, H - 72, 36);
+    ctx.stroke();
+
+    ctx.strokeStyle = "rgba(255, 204, 41, 0.35)";
+    ctx.lineWidth = 3;
+    roundRect(ctx, 54, 54, W - 108, H - 108, 28);
+    ctx.stroke();
+
+    // 2. Üst Rozet (Resmi Senet Başlığı)
+    ctx.fillStyle = "#ff477e";
+    roundRect(ctx, 190, 82, W - 380, 64, 32);
+    ctx.fill();
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "900 28px 'Nunito', sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("🎂 DAMLA BLAST • RESMİ DOĞUM GÜNÜ SENEDİ 🎂", W / 2, 115);
+
+    // 3. Kral Damat Metehan Portresi
+    const avatarX = W / 2;
+    const avatarY = 295;
+    const avatarR = 112;
+    drawBoyfriendAvatar(ctx, avatarX, avatarY, avatarR, "king");
+
+    ctx.strokeStyle = "#ffcc29";
+    ctx.lineWidth = 10;
+    ctx.beginPath();
+    ctx.arc(avatarX, avatarY, avatarR + 4, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // 4. Ana Başlık ve Skor Özeti
+    ctx.fillStyle = "#ffcc29";
+    ctx.font = "900 54px 'Fredoka', 'Nunito', sans-serif";
+    ctx.fillText("İYİ Kİ DOĞDUN DAMLA! 👑", W / 2, 468);
+
+    const scoreVal = Math.max(state.score, state.bestScore, config.targetBirthdayScore || 1500);
+    const dateStr = new Date().toLocaleDateString("tr-TR");
+    ctx.fillStyle = "#80ffdb";
+    ctx.font = "800 30px 'Nunito', sans-serif";
+    ctx.fillText(
+      `SKOR: ${scoreVal.toLocaleString("tr-TR")} PUAN  •  TARİH: ${dateStr}`,
+      W / 2,
+      522
+    );
+
+    // 5. Kazanılan Kademeli Ödüller Kutusu
+    ctx.fillStyle = "rgba(255, 255, 255, 0.07)";
+    ctx.strokeStyle = "rgba(255, 204, 41, 0.45)";
+    ctx.lineWidth = 3;
+    roundRect(ctx, 90, 565, W - 180, 275, 24);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = "#ffcc29";
+    ctx.font = "900 28px 'Nunito', sans-serif";
+    ctx.fillText("💸 METEHAN'IN CÜZDANINDAN KAZANILAN HAKLAR:", W / 2, 610);
+
+    const tierItems = [
+      "✅ ☕ 1 Adet Kahve Borcu (300 Puan Barajı)",
+      "✅ 🍰 Kahve + İstediğin Tatlı (650 Puan Barajı)",
+      "✅ 🍽️ Lüks Akşam Yemeği + Tatlı + Kahve (1050 Puan Barajı)",
+      "✅ 👑 VIP Tam Paket + %100 Haklılık Garantisi (1500 Puan)"
+    ];
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "800 27px 'Nunito', sans-serif";
+    ctx.textAlign = "left";
+    tierItems.forEach((line, idx) => {
+      ctx.fillText(line, 135, 662 + idx * 44);
+    });
+
+    // 6. VIP Doğum Günü Kupon Metni Kutusu
+    ctx.fillStyle = "rgba(255, 204, 41, 0.12)";
+    ctx.strokeStyle = "#ffcc29";
+    ctx.lineWidth = 4;
+    roundRect(ctx, 90, 870, W - 180, 265, 24);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#ffcc29";
+    ctx.font = "900 30px 'Nunito', sans-serif";
+    ctx.fillText(
+      (config.coupon && config.coupon.couponHeader) || "🎁 METEHAN'DAN VIP DOĞUM GÜNÜ KUPONU",
+      W / 2,
+      918
+    );
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "700 26px 'Nunito', sans-serif";
+    const rewardText =
+      (config.coupon && config.coupon.rewardText) ||
+      "Bu kuponla Metehan'dan 1 adet lüks akşam yemeği, sınırsız kahve/tatlı ve tartışmasız %100 HAKLILIK hakkı kazandın!";
+    const wrapped = wrapCanvasLines(ctx, rewardText, W - 260);
+    wrapped.slice(0, 4).forEach((ln, idx) => {
+      ctx.fillText(ln, W / 2, 972 + idx * 38);
+    });
+
+    // 7. Resmi Mühür Damgası
+    ctx.save();
+    ctx.translate(W / 2, 1218);
+    ctx.rotate(-0.035);
+    ctx.fillStyle = "rgba(255, 71, 126, 0.18)";
+    ctx.strokeStyle = "#ff477e";
+    ctx.lineWidth = 6;
+    roundRect(ctx, -370, -40, 740, 80, 18);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = "#ffcc29";
+    ctx.font = "900 32px 'Fredoka', 'Nunito', sans-serif";
+    ctx.fillText(
+      `${(config.boyfriendName || "METEHAN").toUpperCase()} ONAYLI • İTİRAZ EDİLEMEZ`,
+      0,
+      2
+    );
+    ctx.restore();
+
+    return card;
+  }
+
+  function downloadCouponPng(cardCanvas) {
+    const dataUrl = cardCanvas.toDataURL("image/png");
+    const a = document.createElement("a");
+    a.href = dataUrl;
+    a.download = "Damla_Dogum_Gunu_Senedi.png";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  function shareOrDownloadCouponImage() {
+    sfx.playCashRegister();
+    const cardCanvas = renderOfficialCouponCardCanvas();
+
+    if (typeof cardCanvas.toBlob !== "function") {
+      downloadCouponPng(cardCanvas);
+      return;
+    }
+
+    cardCanvas.toBlob((blob) => {
+      if (!blob) {
+        downloadCouponPng(cardCanvas);
+        return;
+      }
+      const file = new File([blob], "Damla_Dogum_Gunu_Senedi.png", { type: "image/png" });
+      if (
+        window.navigator &&
+        typeof window.navigator.canShare === "function" &&
+        window.navigator.canShare({ files: [file] })
+      ) {
+        window.navigator
+          .share({
+            title: "Damla Blast — Resmi Doğum Günü Senedi 👑",
+            text: `Damla Blast'ta ${state.score} puanla tüm ödülleri kazandım! İtiraz edilemez resmi senedim ektedir 😎🎂`,
+            files: [file]
+          })
+          .catch(() => {
+            downloadCouponPng(cardCanvas);
+          });
+      } else {
+        downloadCouponPng(cardCanvas);
+      }
+    }, "image/png");
+  }
+
+  function shareCouponViaWhatsApp() {
+    sfx.playAvatarBoop();
+    const scoreVal = Math.max(state.score, state.bestScore, config.targetBirthdayScore || 1500);
+    const bf = config.boyfriendName || "Metehan";
+    const msg =
+      `🚨 *RESMİ DOĞUM GÜNÜ SENEDİ BİLDİRİMİ* 🚨\n\n` +
+      `Sevgili ${bf}, *Damla Blast* oyununda *${scoreVal.toLocaleString("tr-TR")} Puan* yaparak cüzdanını resmen iflas ettirdim! 💸👑\n\n` +
+      `*Kazanılan Resmi Haklarım:*\n` +
+      `✅ ☕ Kahve Borcu\n` +
+      `✅ 🍰 İstediğim Tatlı\n` +
+      `✅ 🍽️ Lüks Akşam Yemeği\n` +
+      `✅ 👑 %100 Tartışmasız Haklılık Garantisi\n\n` +
+      `*Not:* ${bf.toUpperCase()} ONAYLIDIR, İTİRAZ EDİLEMEZ! 😎🎂❤️`;
+    const waUrl = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+    window.open(waUrl, "_blank", "noopener,noreferrer");
   }
 
   // Koleksiyon ve Cüzdan Durumu Modalı
@@ -1458,6 +1795,11 @@
     const trayRect = dom.trayContainer.getBoundingClientRect();
     dom.trayCanvas.width = trayRect.width * dpr;
     dom.trayCanvas.height = trayRect.height * dpr;
+
+    if (dom.confettiCanvas) {
+      dom.confettiCanvas.width = (window.innerWidth || 390) * dpr;
+      dom.confettiCanvas.height = (window.innerHeight || 844) * dpr;
+    }
 
     state.boardDirty = true;
     state.boardViewDirty = true;
@@ -1686,6 +2028,7 @@
     renderBoard(dpr);
     renderTray(dpr);
     renderLiveAvatars();
+    renderConfetti(dpr);
 
     requestAnimationFrame(renderLoop);
   }
@@ -2383,6 +2726,12 @@
 
     dom.btnAcceptTorpil.addEventListener("click", applyTorpilRescue);
     dom.btnDeclineTorpil.addEventListener("click", openGameOverModal);
+    if (dom.btnShareCouponImage) {
+      dom.btnShareCouponImage.addEventListener("click", shareOrDownloadCouponImage);
+    }
+    if (dom.btnWhatsappCoupon) {
+      dom.btnWhatsappCoupon.addEventListener("click", shareCouponViaWhatsApp);
+    }
     dom.btnCloseCoupon.addEventListener("click", () => dom.dialogCoupon.close());
     dom.btnRestartGame.addEventListener("click", () => {
       dom.dialogGameover.close();
