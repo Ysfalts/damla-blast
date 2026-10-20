@@ -1,0 +1,24 @@
+{
+  "name": "Damla Blast: Doğum Günü Özel",
+  "short_name": "Damla Blast",
+  "description": "Damla için özel olarak hazırlanmış doğum günü sürprizi Block Blast oyunu!",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f1531",
+  "theme_color": "#131936",
+  "icons": [
+    {
+      "src": "assets/icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

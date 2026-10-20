@@ -9,7 +9,7 @@ window.DAMLA_CONFIG = {
   girlfriendName: "Damla",
   boyfriendName: "Metehan",
   birthdayAgeText: "🎂 İYİ Kİ DOĞDUN DAMLA! 🎂",
-  targetBirthdayScore: 1500,
+  targetBirthdayScore: 3500,
 
   // 2. METEHAN 12'Lİ YÜZ & KARAKTER PAKETİ
   photos: {
@@ -35,52 +35,84 @@ window.DAMLA_CONFIG = {
   initialRerollCount: 2,
   bonusJokerEveryScore: 900,
 
-  // 4. METEHAN'IN CÜZDANI & KARAKTER AÇMA AŞAMALARI (4. Madde - Alternatif D)
+  // 4. DOĞUM GÜNÜ SÜRPRİZ KADEMELERİ & KARAKTER AÇMA AŞAMALARI (Genişletilmiş Skor Aralıkları)
   rewardTiers: [
     {
       score: 0,
-      title: "Başlangıç: Cüzdan Güvende 😎",
-      walletStatus: "Cüzdan Rahat",
-      rewardShort: "Sadece Kuru Kutlama",
+      title: "Başlangıç: Doğum Günü Kutlaması 🎂",
+      walletStatus: "Kutlama Başladı 🥳",
+      rewardShort: "Başlangıç Paketi",
       unlockedFaces: ["happy", "love", "panic", "sorry", "cool", "party"],
       unlockedPersonaName: "Klasik & Parti Metehan",
-      quote: "Bakalım doğum günü hediyesi olarak benden ne koparacaksın Damla'm 😎"
+      quote: "Bakalım doğum günü sürprizlerinin hepsini açabilecek misin Damla'm 😎❤️"
     },
     {
-      score: 300,
-      title: "1. Aşama: ☕ Kahve Borcu Açıldı!",
-      walletStatus: "Isınma Turu ☕",
-      rewardShort: "☕ 1 Adet Kahve Borcu",
+      score: 600,
+      title: "1. Sürpriz: ☕ Kahve Sözü Açıldı!",
+      walletStatus: "1. Sürpriz Açıldı ☕",
+      rewardShort: "☕ Özel Kahve Sözü",
       unlockedFaces: ["gym"],
       unlockedPersonaName: "💪 Gym Bro Metehan (Dambıl Bloğu Aktif!)",
-      quote: "300 puan mı?! Tamam kahveler benden! Ayrıca Gym Bro Metehan tahtaya indi 💪"
+      quote: "600 puanı devirdin! Kahveler benden, ayrıca Gym Bro Metehan tahtaya indi 💪"
     },
     {
-      score: 650,
-      title: "2. Aşama: 🍰 Tatlı + Kahve Borcu!",
-      walletStatus: "Hesap Kabarıyor 🍰",
+      score: 1400,
+      title: "2. Sürpriz: 🍰 Tatlı + Kahve Keyfi!",
+      walletStatus: "2. Sürpriz Açıldı 🍰",
       rewardShort: "🍰 Kahve + İstediğin Tatlı",
       unlockedFaces: ["mangal"],
       unlockedPersonaName: "🔥 Mangalcı Metehan (Joker Dolduran Blok Aktif!)",
-      quote: "Damla yavaş oyna! Kahvenin yanına tatlı da eklendi, Mangalcı Metehan göreve başladı 🔥"
+      quote: "1400 puan! Kahvenin yanına en sevdiğin tatlı da eklendi, Mangalcı Metehan görevde 🔥"
     },
     {
-      score: 1050,
-      title: "3. Aşama: 🍽️ Lüks Akşam Yemeği!",
-      walletStatus: "Cüzdan Ağlıyor 💸",
-      rewardShort: "🍽️ Yemek + Tatlı + Kahve",
+      score: 2400,
+      title: "3. Sürpriz: 🍽️ Romantik Akşam Yemeği!",
+      walletStatus: "3. Sürpriz Açıldı 🍽️",
+      rewardShort: "🍽️ Akşam Yemeği + Tatlı",
       unlockedFaces: ["crying", "broke"],
-      unlockedPersonaName: "😭 Trip Yemiş & Cüzdanı Ağlayan Metehan (3x Puan Bloğu!)",
-      quote: "Ocağımı batırdın aşkım! Akşam yemeği de kilitlendi, cüzdanım hüngür hüngür ağlıyor 💸😭"
+      unlockedPersonaName: "😭 Trip Yemiş & Şaşkın Metehan (3x Puan Bloğu!)",
+      quote: "2400 puan mı?! Harikasın aşkım, romantik akşam yemeği sözüm de kilitlendi! 😍🍽️"
     },
     {
-      score: 1500,
+      score: 3500,
       title: "FİNAL: 👑 VIP Doğum Günü Kuponu!",
-      walletStatus: "İflas & Tam İtaat 👑",
+      walletStatus: "Tüm Sürprizler Açıldı 👑",
       rewardShort: "👑 VIP Tam Paket + %100 Haklılık",
       unlockedFaces: ["king", "mindblown"],
       unlockedPersonaName: "👑 Kraliyet Damat Metehan (Tüm Yüzler Açıldı!)",
-      quote: "TEBRİKLER AŞKIM! Beni tamamen patlattın, VIP Doğum Günü Kuponun hazır! 🎂❤️"
+      quote: "TEBRİKLER AŞKIM! 3500 puanla rekorları altüst ettin, VIP Doğum Günü Kuponun hazır! 🎂❤️"
+    }
+  ],
+
+  // 4B. ÜSTTEN KAYARAK İNEN SAHTE WHATSAPP BİLDİRİMLERİ (Geniş Skor Aralıkları)
+  whatsappNotifications: [
+    {
+      score: 800,
+      sender: "Metehan ❤️",
+      time: "şimdi",
+      avatarMood: "love",
+      message: "Aşkım bu ne hız?! Daha ısınma turundaydık, rekorumu tarihe gömdün resmen 😍👑"
+    },
+    {
+      score: 1800,
+      sender: "Metehan ❤️",
+      time: "şimdi",
+      avatarMood: "gym",
+      message: "Sporda 100 kilo basıyorum ama senin şu blokları patlatma gücün karşısında saygıyla eğiliyorum 💪😂"
+    },
+    {
+      score: 3000,
+      sender: "Metehan ❤️",
+      time: "şimdi",
+      avatarMood: "sorry",
+      message: "Annem aradı 'Damla yine mi haklı çıktı' diye soruyor, 'Evet anne her zamanki gibi' dedim 🥰👑"
+    },
+    {
+      score: 4500,
+      sender: "Metehan ❤️",
+      time: "şimdi",
+      avatarMood: "king",
+      message: "Doğum günü kraliçem durdurulamıyor! İstediğin her yerde kutlama sözüm olsun sevgilim 🎂❤️"
     }
   ],
 
@@ -122,7 +154,7 @@ window.DAMLA_CONFIG = {
       "Damla uyudun mu yoksa bana trip mi atıyorsun? 🥺",
       "Aşkım mangaldaki etler yandı, hâlâ tek bir blok koymadın! 🔥",
       "Biliyorum yüzüme bakmaktan oyuna odaklanamıyorsun 😎",
-      "Alooo doğum günü kızı, cüzdanımı kurtarmak için bilerek mi beklemedesin?",
+      "Alooo doğum günü kızı, sıradaki hamleni heyecanla bekliyorum! 🎂",
       "Şapkamı düzeltip bekliyorum, hadi patlat bir satır artık!"
     ],
 
@@ -163,7 +195,7 @@ window.DAMLA_CONFIG = {
       "HELAL DAMLA'MA! 😍",
       "İşte benim favori oyuncum be!",
       "Nasıl da patlattı ama! 👏",
-      "Harikasın sevgilim, cüzdanımdan bir banknot daha uçtu 💸",
+      "Harikasın sevgilim, böyle devam! 🌟",
       "Zeka küpü müsün mübarek!",
       "Kafamı patlattın ama sana feda olsun ❤️"
     ],
@@ -174,7 +206,7 @@ window.DAMLA_CONFIG = {
       "ÇİFTE PATLAMA! Saygıyla eğiliyorum kraliçem 🙇‍♂️",
       "Beni de böyle patlatıyorsun Damla! 💥",
       "Mükemmel hamle, tek kelime itiraz edemem!",
-      "İki satırı birden sildi, cüzdanım titremeye başladı 💸"
+      "İki satırı birden sildi, gözlerim kamaştı ✨"
     ],
 
     // 3+ satır veya yüksek seri kombosu
@@ -183,7 +215,7 @@ window.DAMLA_CONFIG = {
       "DÜNYANIN EN İYİ BLOCK BLAST OYUNCUSU! 🏆",
       "ŞOV YAPIYOR ŞOV! KRALİÇEM BENİM! 🔥",
       "AKLIM BAŞIMDAN GİTTİ DAMLA, BU NASIL KOMBO?! 🤯❤️",
-      "REKORLARIN EFENDİSİ! Cüzdanımı komple sana devrediyorum 💸👑"
+      "REKORLARIN EFENDİSİ! Doğum günün kutlu olsun sevgilim 🎂👑"
     ],
 
     // Özel Etkinlik Blokları Patladığında
@@ -217,7 +249,7 @@ window.DAMLA_CONFIG = {
   comicPopups: [
     "ŞAAAK! 💥",
     "YİNE HAKLISIN! 👑",
-    "CÜZDAN GİTTİ! 💸",
+    "DOĞUM GÜNÜ KRALİÇESİ! 🎂",
     "HELAL AŞKIMA! ❤️",
     "AŞKIM YAVAŞ! 😱",
     "TAM İSABET! 🎯",

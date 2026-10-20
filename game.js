@@ -54,19 +54,96 @@
     { id: "cyan", main: "#00bbf9", light: "#90e0ef", dark: "#006ba6", glow: "rgba(0, 187, 249, 0.55)" }
   ];
 
-  // 11 Metehan Yüzü Tanımları (Koleksiyon Ekranı İçin)
+  // 11 Metehan Yüzü Tanımları (Koleksiyon & Büyütme Ekranı İçin - Genişletilmiş Puan Aralıkları)
   const PERSONA_CATALOG = [
-    { key: "happy", name: "Klasik Metehan", unlockScore: 0 },
-    { key: "love", name: "Kalp Gözlü", unlockScore: 0 },
-    { key: "panic", name: "Terleyen Manita", unlockScore: 0 },
-    { key: "sorry", name: "Güllü Özür", unlockScore: 0 },
-    { key: "cool", name: "Piyasa Modu", unlockScore: 0 },
-    { key: "party", name: "Parti Çocuğu", unlockScore: 0 },
-    { key: "gym", name: "Gym Bro 💪", unlockScore: 300 },
-    { key: "mangal", name: "Mangal Şefi 🔥", unlockScore: 650 },
-    { key: "crying", name: "Trip Yemiş 😭", unlockScore: 1050 },
-    { key: "broke", name: "Cüzdan Ağlıyor 💸", unlockScore: 1050 },
-    { key: "king", name: "Kral Damat 👑", unlockScore: 1500 }
+    {
+      key: "happy",
+      name: "Klasik Metehan",
+      unlockScore: 0,
+      role: "Başlangıç Paketi • Her Zaman Yanında",
+      power: "✨ Özel Yetenek: Damla'ya her koşulda hayranlıkla bakma ve moral verme garantisi.",
+      quote: "Gülüşün bütün oyun tahtasını aydınlatıyor sevgilim, iyi ki doğdun! ❤️"
+    },
+    {
+      key: "love",
+      name: "Kalp Gözlü 😍",
+      unlockScore: 0,
+      role: "Başlangıç Paketi • Aşık Modu",
+      power: "💖 Özel Yetenek: Tek satır bile patlatsan Dünya Kupası kazanmışsın gibi alkışlar.",
+      quote: "Sen blok yerleştirirken bile dünyanın en tatlı insanısın! 😍🎂"
+    },
+    {
+      key: "panic",
+      name: "Terleyen Manita 🥵",
+      unlockScore: 0,
+      role: "Başlangıç Paketi • Sıkışma Alarmı",
+      power: "🚨 Özel Yetenek: Tahta %65 dolduğunda soğuk terler döküp seni uyarır.",
+      quote: "Aşkım tahta biraz doldu sanki... Yanarsan vallahi benim suçum değil! 😅"
+    },
+    {
+      key: "sorry",
+      name: "Güllü Özür 💐",
+      unlockScore: 0,
+      role: "Joker Karakteri • 3x3 Bomba",
+      power: "💐 Özel Yetenek: 'Özür Dilerim Haklısın' jokeriyle 3x3 alanı güllerle tertemiz açar.",
+      quote: "Ne konuda olduğunu bilmiyorum ama %100 sen haklısın aşkım, al çiçeklerin! 💐"
+    },
+    {
+      key: "cool",
+      name: "Piyasa Modu 😎",
+      unlockScore: 0,
+      role: "Joker Karakteri • Hallederiz Modu",
+      power: "😎 Özel Yetenek: 'Ben Hallederim' jokeriyle en zor anında 3 adet kurtarıcı 1x1 blok verir.",
+      quote: "Sen hiç stres yapma güzelim, arkanı yaslan Metehan halleder! 😎✨"
+    },
+    {
+      key: "party",
+      name: "Parti Çocuğu 🥳",
+      unlockScore: 0,
+      role: "Doğum Günü Özel • Kutlama Modu",
+      power: "🎉 Özel Yetenek: Her kombo sonrası konfeti ve doğum günü neşesi saçar.",
+      quote: "Bugün Damla'nın günü! Bütün düdükler ve konfetiler kraliçemiz için! 🥳🎂"
+    },
+    {
+      key: "gym",
+      name: "Gym Bro 💪",
+      unlockScore: 600,
+      role: "600 Puan Ödülü • Güçlü Blok",
+      power: "💪 Özel Yetenek: Tahtada patlatıldığında 100 kg dambıl basıp rastgele 3 dolu bloğu daha ezer!",
+      quote: "Sporda 100 kilo basıyorum ama senin tek bir bakışın beni nakavt ediyor! 💪🔥"
+    },
+    {
+      key: "mangal",
+      name: "Mangal Şefi 🔥",
+      unlockScore: 1400,
+      role: "1400 Puan Ödülü • Joker Üretici",
+      power: "🔥 Özel Yetenek: Tahtada patlatıldığında maşayı şıklatır ve anında +1 Joker hakkı doldurur!",
+      quote: "Maşayı da tatlıyı da hazırladım, bu skordan sonra sana ziyafet borcumuz oldu! 🔥🍰"
+    },
+    {
+      key: "crying",
+      name: "Trip Yemiş 😭",
+      unlockScore: 2400,
+      role: "2400 Puan Ödülü • 3 Kat Puan",
+      power: "😭 Özel Yetenek: Patlatıldığında 'Trip Çözüldü' bonusu olarak +150 ekstra puan kazandırır!",
+      quote: "Tamam aşkım bir daha 'fark etmez' demeyeceğim, nereye istersen oraya gidiyoruz! 😭❤️"
+    },
+    {
+      key: "broke",
+      name: "Şaşkın Manita 😱",
+      unlockScore: 2400,
+      role: "2400 Puan Ödülü • Rekor Şoku",
+      power: "⚡ Özel Yetenek: Yüksek skor barajlarını yıktığında şaşkınlıktan küçük dilini yutar.",
+      quote: "2400 puan mı?! Bu nasıl bir zeka, karşında saygıyla eğiliyorum! 😱👑"
+    },
+    {
+      key: "king",
+      name: "Kral Damat 👑",
+      unlockScore: 3500,
+      role: "3500 Puan Büyük Ödülü • VIP Mod",
+      power: "👑 Özel Yetenek: Büyük Doğum Günü Senedini mühürler ve tahtayı kraliçesi için kurtarır.",
+      quote: "3500 puanlık büyük ödül senindir kraliçem! İyi ki doğdun, iyi ki varsın! 👑🎂❤️"
+    }
   ];
 
   // Standart Block Blast Polyomino Şekilleri
@@ -135,12 +212,15 @@
   }
 
   // ============================================================================
-  // SES EFEKT MOTORU (Web Audio API - Karakter Özel Sesleriyle)
+  // SES EFEKT MOTORU & DAMLA ÖZEL MÜZİK KUTUSU (Web Audio API - Kalimba & SFX)
   // ============================================================================
   class SoundEngine {
     constructor() {
       this.ctx = null;
       this.enabled = true;
+      this.musicEnabled = false;
+      this.musicTimer = null;
+      this.musicStep = 0;
     }
 
     init() {
@@ -188,6 +268,162 @@
       gain.connect(this.ctx.destination);
       osc.start(start);
       osc.stop(start + duration + 0.02);
+    }
+
+    // Tatlı Kalimba / Müzik Kutusu (Music Box) tınısı: ana sine + hafif 2. ve 3. harmonik çan tınısı
+    playKalimbaNote(freq, duration = 0.65, vol = 0.065, delay = 0) {
+      if (!this.enabled) return;
+      this.init();
+      if (!this.ctx) return;
+
+      const start = this.ctx.currentTime + delay;
+      const mainOsc = this.ctx.createOscillator();
+      const chimeOsc = this.ctx.createOscillator();
+      const mainGain = this.ctx.createGain();
+      const chimeGain = this.ctx.createGain();
+
+      mainOsc.type = "sine";
+      mainOsc.frequency.setValueAtTime(freq, start);
+
+      chimeOsc.type = "triangle";
+      chimeOsc.frequency.setValueAtTime(freq * 2, start);
+
+      mainGain.gain.setValueAtTime(0.0008, start);
+      mainGain.gain.linearRampToValueAtTime(vol, start + 0.012);
+      mainGain.gain.exponentialRampToValueAtTime(0.0008, start + duration);
+
+      chimeGain.gain.setValueAtTime(0.0005, start);
+      chimeGain.gain.linearRampToValueAtTime(vol * 0.28, start + 0.008);
+      chimeGain.gain.exponentialRampToValueAtTime(0.0005, start + duration * 0.45);
+
+      mainOsc.connect(mainGain);
+      chimeOsc.connect(chimeGain);
+      mainGain.connect(this.ctx.destination);
+      chimeGain.connect(this.ctx.destination);
+
+      mainOsc.start(start);
+      chimeOsc.start(start);
+      mainOsc.stop(start + duration + 0.03);
+      chimeOsc.stop(start + duration * 0.5 + 0.03);
+    }
+
+    // 🎵 #3: Damla'ya Özel "İyi ki Doğdun + D-A-M-L-A" Müzik Kutusu Melodisi
+    // Notalar:
+    // 1. Bölüm: "İyi ki doğdun Damla" (Re majör sıcak müzik kutusu)
+    // 2. Bölüm: D-A-M-L-A Harf Motif Notaları -> D(Re5) - A(La5) - M(Mi5/Fa#5) - L(La5) - A(Re6)
+    startMusicBox() {
+      this.init();
+      this.musicEnabled = true;
+      if (this.musicTimer) clearTimeout(this.musicTimer);
+
+      // Frekans tablosu (Hz)
+      const A4 = 440.0;
+      const B4 = 493.88;
+      const Cs5 = 554.37;
+      const D5 = 587.33;
+      const E5 = 659.25;
+      const Fs5 = 739.99;
+      const G5 = 783.99;
+      const A5 = 880.0;
+      const B5 = 987.77;
+      const D6 = 1174.66;
+
+      const MELODY_SEQUENCE = [
+        // 1. Cümle: "İyi ki doğdun..." (A4 A4 B4 A4 D5 C#5)
+        { f: A4, b: 0.36, h: 293.66 },
+        { f: A4, b: 0.26 },
+        { f: B4, b: 0.52, h: 369.99 },
+        { f: A4, b: 0.52 },
+        { f: D5, b: 0.52, h: 440.0 },
+        { f: Cs5, b: 0.92, h: 329.63 },
+
+        // 2. Cümle: "İyi ki doğdun..." (A4 A4 B4 A4 E5 D5)
+        { f: A4, b: 0.36 },
+        { f: A4, b: 0.26 },
+        { f: B4, b: 0.52, h: 329.63 },
+        { f: A4, b: 0.52 },
+        { f: E5, b: 0.52, h: 440.0 },
+        { f: D5, b: 0.92, h: 293.66 },
+
+        // 3. Cümle: "İyi ki doğdun Damla'm..." (A4 A4 A5 F#5 D5 C#5 B4)
+        { f: A4, b: 0.36 },
+        { f: A4, b: 0.26 },
+        { f: A5, b: 0.54, h: 440.0 },
+        { f: Fs5, b: 0.52 },
+        { f: D5, b: 0.52, h: 369.99 },
+        { f: Cs5, b: 0.52 },
+        { f: B4, b: 0.88, h: 392.0 },
+
+        // 4. Cümle: "İyi ki doğdun!" (G5 G5 F#5 D5 E5 D5)
+        { f: G5, b: 0.36, h: 392.0 },
+        { f: G5, b: 0.26 },
+        { f: Fs5, b: 0.52, h: 293.66 },
+        { f: D5, b: 0.52 },
+        { f: E5, b: 0.56, h: 329.63 },
+        { f: D5, b: 0.95, h: 293.66 },
+
+        // 5. Cümle (ÖZEL): D - A - M - L - A İmzalı Notalar!
+        // D (D5) - A (A5) - M (E5/F#5) - L (A5) - A (D6)
+        { f: D5, b: 0.42, h: 293.66 }, // D
+        { f: A5, b: 0.42, h: 440.0 },  // A
+        { f: Fs5, b: 0.42, h: 369.99 },// M
+        { f: E5, b: 0.42 },            // L
+        { f: A5, b: 0.48, h: 440.0 },  // A
+        { f: B5, b: 0.38 },
+        { f: A5, b: 0.38 },
+        { f: Fs5, b: 0.45 },
+        { f: D6, b: 1.25, h: 587.33 }  // Kapanış Işıltısı
+      ];
+
+      const stepLoop = () => {
+        if (!this.musicEnabled) return;
+        const item = MELODY_SEQUENCE[this.musicStep % MELODY_SEQUENCE.length];
+        this.musicStep = (this.musicStep + 1) % MELODY_SEQUENCE.length;
+
+        if (this.enabled && item && item.f) {
+          this.playKalimbaNote(item.f, Math.max(0.55, item.b * 1.35), 0.055, 0);
+          if (item.h) {
+            this.playKalimbaNote(item.h, Math.max(0.7, item.b * 1.6), 0.032, 0.02);
+          }
+        }
+        this.musicTimer = setTimeout(stepLoop, Math.round((item ? item.b : 0.5) * 1000));
+      };
+
+      stepLoop();
+    }
+
+    stopMusicBox() {
+      this.musicEnabled = false;
+      if (this.musicTimer) {
+        clearTimeout(this.musicTimer);
+        this.musicTimer = null;
+      }
+    }
+
+    toggleMusicBox() {
+      if (this.musicEnabled) {
+        this.stopMusicBox();
+      } else {
+        this.startMusicBox();
+      }
+      return this.musicEnabled;
+    }
+
+    // 🕯️ Mum üfleme sesi: D-A-M-L-A notaları sırayla parlar
+    playCandleBlow(index = 0) {
+      const damlaNotes = [587.33, 659.25, 739.99, 880.0, 1174.66]; // D5, E5, F#5, A5, D6
+      const note = damlaNotes[index % damlaNotes.length];
+      this.tone(180, "sine", 0.14, 0.12, 0, 95); // hafif üfleme rüzgarı
+      this.playKalimbaNote(note, 0.65, 0.14, 0.03);
+      this.playKalimbaNote(note * 1.5, 0.45, 0.06, 0.09);
+      this.vibrate(18);
+    }
+
+    // 💬 WhatsApp bildirimi sesi
+    playWhatsAppPing() {
+      this.playKalimbaNote(783.99, 0.25, 0.12, 0);
+      this.playKalimbaNote(1174.66, 0.42, 0.15, 0.11);
+      this.vibrate([20, 35, 30]);
     }
 
     playPickup() {
@@ -460,6 +696,16 @@
     floatingTexts: [], // 5. Madde: Tahta üstü çizgi roman balonları
     confetti: [],      // Tam ekran doğum günü konfeti yağmuru
     confettiActive: false,
+    shownWaScores: new Set(), // Gösterilmiş WhatsApp bildirim skorları
+    activePersonaDetail: null,
+    candles: [
+      { letter: "D", color: "#ff477e", lit: true, smoke: [] },
+      { letter: "A", color: "#ffb703", lit: true, smoke: [] },
+      { letter: "M", color: "#06d6a0", lit: true, smoke: [] },
+      { letter: "L", color: "#4cc9f0", lit: true, smoke: [] },
+      { letter: "A", color: "#9b5de5", lit: true, smoke: [] }
+    ],
+    cakeCompleted: false,
     cellSize: 40,
     boardPixelSize: 320,
     timeSec: 0,
@@ -495,10 +741,17 @@
   // DOM REFERANSLARI
   // ============================================================================
   const dom = {
+    cakeCeremonyScreen: document.getElementById("cake-ceremony-screen"),
+    cakeCanvas: document.getElementById("cake-canvas"),
+    cakeCandleStatus: document.getElementById("cake-candle-status"),
+    btnBlowAllCandles: document.getElementById("btn-blow-all-candles"),
+    btnSkipCake: document.getElementById("btn-skip-cake"),
+
     startScreen: document.getElementById("start-screen"),
     birthdayPill: document.getElementById("ui-birthday-pill"),
     leaderboardList: document.getElementById("leaderboard-list"),
     btnStartGame: document.getElementById("btn-start-game"),
+    btnReplayCake: document.getElementById("btn-replay-cake"),
     btnOpenSettingsStart: document.getElementById("btn-open-settings-start"),
     heroAvatarCanvas: document.getElementById("hero-avatar-canvas"),
 
@@ -512,8 +765,14 @@
 
     btnOpenCollection: document.getElementById("btn-open-collection"),
     btnGiftCoupon: document.getElementById("btn-gift-coupon"),
+    btnMusicToggle: document.getElementById("btn-music-toggle"),
     btnSoundToggle: document.getElementById("btn-sound-toggle"),
     btnOpenSettings: document.getElementById("btn-open-settings"),
+
+    whatsappToast: document.getElementById("whatsapp-toast"),
+    waAvatarCanvas: document.getElementById("wa-avatar-canvas"),
+    waSenderName: document.getElementById("wa-sender-name"),
+    waMessageText: document.getElementById("wa-message-text"),
 
     manitaLiveBar: document.getElementById("manita-live-bar"),
     manitaAvatarWrapper: document.getElementById("manita-avatar-wrapper"),
@@ -581,6 +840,15 @@
     btnCloseCollection: document.getElementById("btn-close-collection"),
     collectionTiersList: document.getElementById("collection-tiers-list"),
     collectionFacesGrid: document.getElementById("collection-faces-grid"),
+
+    dialogPersonaDetail: document.getElementById("dialog-persona-detail"),
+    btnClosePersonaDetailX: document.getElementById("btn-close-persona-detail-x"),
+    personaDetailImg: document.getElementById("persona-detail-img"),
+    personaDetailName: document.getElementById("persona-detail-name"),
+    personaDetailRole: document.getElementById("persona-detail-role"),
+    personaDetailPower: document.getElementById("persona-detail-power"),
+    personaDetailQuote: document.getElementById("persona-detail-quote"),
+    btnActivatePersona: document.getElementById("btn-activate-persona"),
 
     dialogSettings: document.getElementById("dialog-settings"),
     btnCloseSettingsX: document.getElementById("btn-close-settings-x"),
@@ -762,7 +1030,7 @@
     sorry: { emoji: "💐", tag: "Özür Diliyor", cls: "mood-happy" },
     guilty: { emoji: "😅", tag: "Suçluluk Duyuyor", cls: "mood-guilty" },
     crying: { emoji: "😭", tag: "Trip Yedi Ağlıyor", cls: "mood-guilty" },
-    broke: { emoji: "💸", tag: "Cüzdan Ağlıyor!", cls: "mood-panic" },
+    broke: { emoji: "😱", tag: "Şaşkın Manita!", cls: "mood-panic" },
     panic: { emoji: "🥵", tag: "Sıkıştı & Terliyor!", cls: "mood-panic" }
   };
 
@@ -1211,7 +1479,7 @@
   }
 
   // ============================================================================
-  // PUAN, CÜZDAN KATLAMA VE KARAKTER KOLEKSİYON SİSTEMİ (4. Madde - Alternatif D)
+  // PUAN, SÜRPRİZ HEDİYE BARI, WHATSAPP BİLDİRİMLERİ & KOLEKSİYON SİSTEMİ
   // ============================================================================
   let toastTimer = null;
   function showTierUnlockToast(tierObj, avatarMood) {
@@ -1221,7 +1489,7 @@
 
     const ctx = dom.toastAvatarCanvas.getContext("2d");
     ctx.clearRect(0, 0, 68, 68);
-    drawBoyfriendAvatar(ctx, 34, 34, 31, avatarMood || "broke", state.timeSec);
+    drawBoyfriendAvatar(ctx, 34, 34, 31, avatarMood || "party", state.timeSec);
 
     if (toastTimer) clearTimeout(toastTimer);
     toastTimer = setTimeout(() => {
@@ -1229,9 +1497,47 @@
     }, 3400);
   }
 
+  // 💬 #4: Üstten İnen Sahte WhatsApp Bildirimi (800 / 1800 / 3000 / 4500 Puan)
+  let waToastTimer = null;
+  function showWhatsAppNotification(waItem) {
+    if (!dom.whatsappToast || !waItem) return;
+    sfx.playWhatsAppPing();
+
+    const bf = config.boyfriendName || "Metehan";
+    if (dom.waSenderName) {
+      dom.waSenderName.textContent = waItem.sender || `${bf} ❤️`;
+    }
+    if (dom.waMessageText) {
+      dom.waMessageText.textContent = waItem.text || "";
+    }
+    if (dom.waAvatarCanvas) {
+      const ctx = dom.waAvatarCanvas.getContext("2d");
+      ctx.clearRect(0, 0, 64, 64);
+      drawBoyfriendAvatar(ctx, 32, 32, 29, waItem.mood || "love", state.timeSec);
+    }
+
+    dom.whatsappToast.classList.remove("hidden");
+    if (waToastTimer) clearTimeout(waToastTimer);
+    waToastTimer = setTimeout(() => {
+      dom.whatsappToast.classList.add("hidden");
+    }, 5200);
+  }
+
+  function checkWhatsAppNotifications() {
+    const list = config.whatsappNotifications || [];
+    for (let i = 0; i < list.length; i++) {
+      const item = list[i];
+      if (state.score >= item.score && !state.shownWaScores.has(item.score)) {
+        state.shownWaScores.add(item.score);
+        showWhatsAppNotification(item);
+        break;
+      }
+    }
+  }
+
   function updateWalletProgressAndTiers() {
     const tiers = config.rewardTiers || [];
-    const finalTarget = config.targetBirthdayScore || 1500;
+    const finalTarget = config.targetBirthdayScore || 3500;
     const pct = Math.min(100, (state.score / finalTarget) * 100);
     dom.uiGoalFill.style.width = `${pct}%`;
 
@@ -1243,7 +1549,7 @@
       }
     }
 
-    // Yeni aşama geçildiyse karakterleri aç ve cüzdanı ağlat!
+    // Yeni aşama geçildiyse karakterleri ve sürpriz hediyeleri aç!
     if (reachedIndex > state.currentTierIndex) {
       for (let idx = state.currentTierIndex + 1; idx <= reachedIndex; idx++) {
         const t = tiers[idx];
@@ -1260,8 +1566,8 @@
         sfx.playCashRegister();
         spawnConfettiBurst(85);
         const unlockedFaceKey =
-          (newlyReached.unlockedFaces && newlyReached.unlockedFaces[0]) || "broke";
-        setManitaMood("broke", newlyReached.quote);
+          (newlyReached.unlockedFaces && newlyReached.unlockedFaces[0]) || "party";
+        setManitaMood(unlockedFaceKey, newlyReached.quote);
         showTierUnlockToast(newlyReached, unlockedFaceKey);
       }
     }
@@ -1270,11 +1576,11 @@
     const nextTier = tiers[state.currentTierIndex + 1];
 
     if (activeTier) {
-      dom.uiWalletBadge.textContent = `💸 ${activeTier.walletStatus}`;
+      dom.uiWalletBadge.textContent = `🎁 ${activeTier.walletStatus}`;
     }
 
     if (nextTier) {
-      dom.uiGoalLabel.textContent = `💸 Sıradaki: ${nextTier.rewardShort}`;
+      dom.uiGoalLabel.textContent = `🎁 Sıradaki: ${nextTier.rewardShort}`;
       dom.uiGoalNumbers.textContent = `${state.score} / ${nextTier.score}`;
     } else {
       dom.uiGoalLabel.textContent = "👑 VIP Doğum Günü Kuponu Hazır!";
@@ -1313,6 +1619,7 @@
     }
 
     updateWalletProgressAndTiers();
+    checkWhatsAppNotifications();
   }
 
   function updateStreakBadge() {
@@ -1605,13 +1912,13 @@
 
     ctx.fillStyle = "#ffcc29";
     ctx.font = "900 28px 'Nunito', sans-serif";
-    ctx.fillText("💸 METEHAN'IN CÜZDANINDAN KAZANILAN HAKLAR:", W / 2, 610);
+    ctx.fillText("🎁 METEHAN'DAN KAZANILAN RESMİ DOĞUM GÜNÜ HAKLARI:", W / 2, 610);
 
     const tierItems = [
-      "✅ ☕ 1 Adet Kahve Borcu (300 Puan Barajı)",
-      "✅ 🍰 Kahve + İstediğin Tatlı (650 Puan Barajı)",
-      "✅ 🍽️ Lüks Akşam Yemeği + Tatlı + Kahve (1050 Puan Barajı)",
-      "✅ 👑 VIP Tam Paket + %100 Haklılık Garantisi (1500 Puan)"
+      "✅ ☕ 1 Adet Kahve Sözü (600 Puan Barajı)",
+      "✅ 🍰 Kahve + İstediğin Tatlı (1400 Puan Barajı)",
+      "✅ 🍽️ Lüks Akşam Yemeği + Tatlı + Kahve (2400 Puan Barajı)",
+      "✅ 👑 VIP Tam Paket + %100 Haklılık Garantisi (3500 Puan)"
     ];
     ctx.fillStyle = "#ffffff";
     ctx.font = "800 27px 'Nunito', sans-serif";
@@ -1717,22 +2024,51 @@
 
   function shareCouponViaWhatsApp() {
     sfx.playAvatarBoop();
-    const scoreVal = Math.max(state.score, state.bestScore, config.targetBirthdayScore || 1500);
+    const scoreVal = Math.max(state.score, state.bestScore, config.targetBirthdayScore || 3500);
     const bf = config.boyfriendName || "Metehan";
     const msg =
       `🚨 *RESMİ DOĞUM GÜNÜ SENEDİ BİLDİRİMİ* 🚨\n\n` +
-      `Sevgili ${bf}, *Damla Blast* oyununda *${scoreVal.toLocaleString("tr-TR")} Puan* yaparak cüzdanını resmen iflas ettirdim! 💸👑\n\n` +
+      `Sevgili ${bf}, *Damla Blast* oyununda *${scoreVal.toLocaleString("tr-TR")} Puan* yaparak bütün doğum günü ödüllerini resmen kazandım! 🎂👑\n\n` +
       `*Kazanılan Resmi Haklarım:*\n` +
-      `✅ ☕ Kahve Borcu\n` +
-      `✅ 🍰 İstediğim Tatlı\n` +
-      `✅ 🍽️ Lüks Akşam Yemeği\n` +
-      `✅ 👑 %100 Tartışmasız Haklılık Garantisi\n\n` +
+      `✅ ☕ Kahve Sözü (600 Puan)\n` +
+      `✅ 🍰 İstediğim Tatlı (1400 Puan)\n` +
+      `✅ 🍽️ Lüks Akşam Yemeği (2400 Puan)\n` +
+      `✅ 👑 %100 Tartışmasız Haklılık Garantisi (3500 Puan)\n\n` +
       `*Not:* ${bf.toUpperCase()} ONAYLIDIR, İTİRAZ EDİLEMEZ! 😎🎂❤️`;
     const waUrl = `https://wa.me/?text=${encodeURIComponent(msg)}`;
     window.open(waUrl, "_blank", "noopener,noreferrer");
   }
 
-  // Koleksiyon ve Cüzdan Durumu Modalı
+  // 📸 #5: Karakter Kartı Büyütme & İnceleme Modalı
+  function openPersonaDetailModal(persona) {
+    if (!persona || !dom.dialogPersonaDetail) return;
+    sfx.playAvatarBoop();
+    state.activePersonaDetail = persona;
+
+    const src = (config.photos && config.photos[persona.key]) || "assets/faces/metehan_happy.jpg";
+    if (dom.personaDetailImg) {
+      dom.personaDetailImg.src = src;
+      dom.personaDetailImg.alt = persona.name;
+    }
+    if (dom.personaDetailName) {
+      dom.personaDetailName.textContent = persona.name;
+    }
+    if (dom.personaDetailRole) {
+      dom.personaDetailRole.textContent = persona.role || "Özel Metehan Karakteri";
+    }
+    if (dom.personaDetailPower) {
+      dom.personaDetailPower.textContent = persona.power || "";
+    }
+    if (dom.personaDetailQuote) {
+      dom.personaDetailQuote.textContent = `"${persona.quote || ""}"`;
+    }
+
+    if (!dom.dialogPersonaDetail.open) {
+      dom.dialogPersonaDetail.showModal();
+    }
+  }
+
+  // Koleksiyon ve Hediye Durumu Modalı
   function openCollectionModal() {
     sfx.playAvatarBoop();
     const tiers = config.rewardTiers || [];
@@ -1754,14 +2090,19 @@
 
     dom.collectionFacesGrid.innerHTML = "";
     PERSONA_CATALOG.forEach((p) => {
-      const unlocked = state.unlockedFaces.has(p.key) || state.bestScore >= p.unlockScore;
+      const unlocked = state.unlockedFaces.has(p.key) || state.bestScore >= p.unlockScore || state.score >= p.unlockScore;
       const src = (config.photos && config.photos[p.key]) || "assets/faces/metehan_happy.jpg";
       const card = document.createElement("div");
       card.className = `face-collect-item ${unlocked ? "unlocked" : "locked"}`;
       card.innerHTML = `
         <img src="${src}" alt="${p.name}" />
-        <span>${unlocked ? p.name : `🔒 ${p.unlockScore}P`}</span>
+        <span>${unlocked ? `🔍 ${p.name}` : `🔒 ${p.unlockScore}P`}</span>
       `;
+      if (unlocked) {
+        card.addEventListener("click", () => {
+          openPersonaDetailModal(p);
+        });
+      }
       dom.collectionFacesGrid.appendChild(card);
     });
 
@@ -2010,10 +2351,15 @@
       dom.dialogGameover.open ||
       dom.dialogCoupon.open ||
       dom.dialogCollection.open ||
+      (dom.dialogPersonaDetail && dom.dialogPersonaDetail.open) ||
       dom.dialogSettings.open;
 
     // 9.5 saniye hamle yapılmazsa Metehan laf atsın! (2. Madde)
-    if (anyDialogOpen || state.dragging) {
+    if (
+      anyDialogOpen ||
+      state.dragging ||
+      (dom.cakeCeremonyScreen && dom.cakeCeremonyScreen.classList.contains("active"))
+    ) {
       state.lastMoveTime = timestamp;
     } else if (
       !dom.startScreen.classList.contains("active") &&
@@ -2025,6 +2371,9 @@
       setManitaMood(chosenM, quoteDeck.pick("idleTimeout"));
     }
 
+    if (dom.cakeCeremonyScreen && dom.cakeCeremonyScreen.classList.contains("active")) {
+      renderCakeCeremony();
+    }
     renderBoard(dpr);
     renderTray(dpr);
     renderLiveAvatars();
@@ -2278,6 +2627,302 @@
   }
 
   // ============================================================================
+  // 🕯️ #1: DOĞUM GÜNÜ PASTASI & 5 MUM (D-A-M-L-A) ÜFLEME RİTÜELİ
+  // ============================================================================
+  function getCandlePositions() {
+    // 340x260 mantıksal koordinat alanında 5 mumun konumları
+    const xs = [98, 134, 170, 206, 242];
+    const baseY = 92;
+    return xs.map((x, idx) => ({
+      index: idx,
+      x,
+      topY: baseY - 38,
+      bottomY: baseY
+    }));
+  }
+
+  function resetCakeCandles() {
+    state.cakeCompleted = false;
+    state.candles.forEach((c) => {
+      c.lit = true;
+      c.smoke = [];
+    });
+    updateCakeCandleStatusUI();
+  }
+
+  function updateCakeCandleStatusUI() {
+    if (!dom.cakeCandleStatus) return;
+    const litCount = state.candles.filter((c) => c.lit).length;
+    if (litCount > 0) {
+      dom.cakeCandleStatus.textContent = `🕯️ Yanan Mumlar: ${litCount} / 5 (Söndürmek İçin Dokun / Kaydır)`;
+    } else {
+      dom.cakeCandleStatus.textContent = "🎉 DİLEĞİN KABUL OLSUN İYİ Kİ DOĞDUN DAMLA! 🎂";
+    }
+  }
+
+  function extinguishCandle(idx) {
+    const c = state.candles[idx];
+    if (!c || !c.lit) return;
+    c.lit = false;
+
+    const pos = getCandlePositions()[idx];
+    for (let i = 0; i < 12; i++) {
+      c.smoke.push({
+        x: pos.x + (Math.random() - 0.5) * 6,
+        y: pos.topY - 6,
+        vx: (Math.random() - 0.5) * 0.9,
+        vy: -0.9 - Math.random() * 1.1,
+        r: 3 + Math.random() * 4,
+        alpha: 0.85,
+        gold: i % 3 === 0
+      });
+    }
+
+    const blownCount = state.candles.filter((item) => !item.lit).length;
+    sfx.playCandleBlow(blownCount - 1);
+    updateCakeCandleStatusUI();
+
+    if (blownCount === state.candles.length && !state.cakeCompleted) {
+      state.cakeCompleted = true;
+      sfx.playFanfare();
+      spawnConfettiBurst(110);
+      // Mumlar üflenince Damla'nın özel müzik kutusu otomatik başlasın!
+      if (!sfx.musicEnabled) {
+        sfx.startMusicBox();
+        syncMusicButtonUI();
+      }
+      setTimeout(() => {
+        if (dom.cakeCeremonyScreen) {
+          dom.cakeCeremonyScreen.classList.remove("active");
+        }
+        dom.startScreen.classList.add("active");
+        state.liveAvatarDirty = true;
+      }, 1550);
+    }
+  }
+
+  function blowAllCandles() {
+    sfx.init();
+    state.candles.forEach((c, idx) => {
+      if (c.lit) {
+        setTimeout(() => {
+          extinguishCandle(idx);
+        }, idx * 130);
+      }
+    });
+  }
+
+  function handleCakePointer(e) {
+    if (!dom.cakeCanvas) return;
+    sfx.init();
+    const rect = dom.cakeCanvas.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+
+    let clientX = e.clientX;
+    let clientY = e.clientY;
+    if (e.touches && e.touches.length > 0) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else if (e.changedTouches && e.changedTouches.length > 0) {
+      clientX = e.changedTouches[0].clientX;
+      clientY = e.changedTouches[0].clientY;
+    }
+
+    const scaleX = 340 / rect.width;
+    const scaleY = 260 / rect.height;
+    const cx = (clientX - rect.left) * scaleX;
+    const cy = (clientY - rect.top) * scaleY;
+
+    const positions = getCandlePositions();
+    let hitAny = false;
+    positions.forEach((p) => {
+      const dx = Math.abs(cx - p.x);
+      const dy = cy - p.topY;
+      if (dx <= 24 && dy >= -35 && dy <= 62) {
+        extinguishCandle(p.index);
+        hitAny = true;
+      }
+    });
+
+    // Eğer pastanın gövdesine tıklandıysa sıradaki yanan mumu söndür
+    if (!hitAny && e.type === "mousedown") {
+      const nextIdx = state.candles.findIndex((c) => c.lit);
+      if (nextIdx !== -1) extinguishCandle(nextIdx);
+    }
+  }
+
+  function renderCakeCeremony() {
+    if (!dom.cakeCanvas) return;
+    const ctx = dom.cakeCanvas.getContext("2d");
+    const W = 340;
+    const H = 260;
+    const t = state.timeSec || 0;
+    const dt = state.dt || 1;
+
+    ctx.clearRect(0, 0, W, H);
+
+    // 1. Arka Plan Işıltı Halkası
+    const glow = ctx.createRadialGradient(W / 2, 125, 10, W / 2, 135, 145);
+    glow.addColorStop(0, "rgba(255, 204, 41, 0.25)");
+    glow.addColorStop(0.6, "rgba(255, 71, 126, 0.1)");
+    glow.addColorStop(1, "rgba(12, 17, 42, 0)");
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, W, H);
+
+    // 2. Altın Pasta Tabağı / Standı
+    ctx.fillStyle = "#e0a92e";
+    roundRect(ctx, 44, 224, W - 88, 12, 6);
+    ctx.fill();
+    ctx.fillStyle = "#b87d14";
+    roundRect(ctx, 135, 234, 70, 12, 5);
+    ctx.fill();
+
+    // 3. 1. Kat (En Alt Geniş Çilekli & Çikolatalı Kat)
+    ctx.fillStyle = "#ff758f";
+    roundRect(ctx, 64, 176, 212, 50, 12);
+    ctx.fill();
+    ctx.fillStyle = "#fff0f3";
+    for (let i = 0; i < 7; i++) {
+      ctx.beginPath();
+      ctx.arc(82 + i * 29, 180, 11, 0, Math.PI);
+      ctx.fill();
+    }
+
+    // 4. 2. Kat (Orta Vanilyalı & Altın Kremalı Kat)
+    ctx.fillStyle = "#ffd166";
+    roundRect(ctx, 84, 132, 172, 46, 10);
+    ctx.fill();
+    ctx.fillStyle = "#ff477e";
+    for (let i = 0; i < 6; i++) {
+      ctx.beginPath();
+      ctx.arc(100 + i * 28, 136, 9, 0, Math.PI);
+      ctx.fill();
+    }
+
+    // 5. 3. Kat (Üst Butik Kat + Metehan Rozeti)
+    ctx.fillStyle = "#c77dff";
+    roundRect(ctx, 106, 92, 128, 42, 10);
+    ctx.fill();
+    ctx.fillStyle = "#ffffff";
+    for (let i = 0; i < 5; i++) {
+      ctx.beginPath();
+      ctx.arc(120 + i * 25, 96, 8, 0, Math.PI);
+      ctx.fill();
+    }
+
+    // Pastanın ortasında minik Kral Metehan rozeti ve "DAMLA" yazısı
+    drawBoyfriendAvatar(ctx, W / 2, 155, 19, state.cakeCompleted ? "king" : "party");
+    ctx.strokeStyle = "#ffcc29";
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    ctx.arc(W / 2, 155, 20, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "900 15px 'Fredoka', 'Nunito', sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("✨ İYİ Kİ DOĞDUN DAMLA ✨", W / 2, 204);
+
+    // 6. 5 Adet "D - A - M - L - A" Mumu ve Canlı Alevleri / Dumanları
+    const positions = getCandlePositions();
+    positions.forEach((p, idx) => {
+      const candle = state.candles[idx];
+      const cw = 16;
+      const ch = 38;
+      const cx = p.x - cw / 2;
+      const cy = p.topY;
+
+      // Mum gövdesi
+      ctx.fillStyle = "#ffffff";
+      roundRect(ctx, cx, cy, cw, ch, 4);
+      ctx.fill();
+      ctx.strokeStyle = candle.color;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Renkli şerit ve Harf (D-A-M-L-A)
+      ctx.fillStyle = candle.color;
+      roundRect(ctx, cx + 2, cy + 9, cw - 4, 20, 3);
+      ctx.fill();
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "900 12px 'Fredoka', 'Nunito', sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(candle.letter, p.x, cy + 19);
+
+      // Fitil
+      ctx.strokeStyle = "#2b2d42";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(p.x, cy);
+      ctx.lineTo(p.x, cy - 5);
+      ctx.stroke();
+
+      if (candle.lit) {
+        // Canlı titreşen çift katmanlı mum alevi
+        const sway = Math.sin(t * 9 + idx * 1.7) * 2.2;
+        const stretch = 1 + Math.cos(t * 12 + idx) * 0.12;
+        const fx = p.x + sway;
+        const fy = cy - 13 * stretch;
+
+        const flameGlow = ctx.createRadialGradient(fx, fy, 2, fx, fy, 22);
+        flameGlow.addColorStop(0, "rgba(255, 230, 109, 0.85)");
+        flameGlow.addColorStop(0.5, "rgba(255, 159, 28, 0.35)");
+        flameGlow.addColorStop(1, "rgba(255, 159, 28, 0)");
+        ctx.fillStyle = flameGlow;
+        ctx.beginPath();
+        ctx.arc(fx, fy, 22, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#ff9f1c";
+        ctx.beginPath();
+        ctx.moveTo(p.x, cy - 4);
+        ctx.quadraticCurveTo(fx - 9, fy, fx, fy - 12 * stretch);
+        ctx.quadraticCurveTo(fx + 9, fy, p.x, cy - 4);
+        ctx.fill();
+
+        ctx.fillStyle = "#fff3b0";
+        ctx.beginPath();
+        ctx.arc(fx, fy - 2, 3.8, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Sönen mumların duman ve altın kıvılcım parçacıkları
+      for (let s = candle.smoke.length - 1; s >= 0; s--) {
+        const sm = candle.smoke[s];
+        sm.x += sm.vx * dt;
+        sm.y += sm.vy * dt;
+        sm.r += 0.12 * dt;
+        sm.alpha -= 0.02 * dt;
+        if (sm.alpha <= 0) {
+          candle.smoke.splice(s, 1);
+          continue;
+        }
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, sm.alpha);
+        ctx.fillStyle = sm.gold ? "#ffcc29" : "rgba(220, 228, 255, 0.78)";
+        ctx.beginPath();
+        ctx.arc(sm.x, sm.y, sm.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    });
+  }
+
+  function syncMusicButtonUI() {
+    if (!dom.btnMusicToggle) return;
+    if (sfx.musicEnabled) {
+      dom.btnMusicToggle.classList.add("music-on");
+      dom.btnMusicToggle.textContent = "🎵";
+    } else {
+      dom.btnMusicToggle.classList.remove("music-on");
+      dom.btnMusicToggle.textContent = "🎶";
+    }
+  }
+
+  // ============================================================================
   // DOKUNMATİK (TOUCH) VE FARE (MOUSE) SÜRÜKLE-BIRAK KONTROLLERİ (0ms GECİKME)
   // ============================================================================
   // Sürükleme hız çarpanı: 1.0 = blok parmakla birebir (1:1) hareket eder.
@@ -2527,6 +3172,7 @@
     state.bombTargetingMode = false;
     state.particles = [];
     state.floatingTexts = [];
+    state.shownWaScores.clear();
     state.couponUnlocked = false;
     dom.btnGiftCoupon.classList.remove("unlocked");
     state.boardDirty = true;
@@ -2663,10 +3309,86 @@
     dom.btnStartGame.addEventListener("click", () => {
       sfx.init();
       sfx.playAvatarBoop();
+      if (!sfx.musicEnabled) {
+        sfx.startMusicBox();
+        syncMusicButtonUI();
+      }
       state.lastMoveTime = performance.now();
       dom.startScreen.classList.remove("active");
       resizeCanvases();
     });
+
+    // 🕯️ #1: Pasta ve Mum Üfleme Kontrolleri
+    if (dom.cakeCanvas) {
+      dom.cakeCanvas.addEventListener("mousedown", handleCakePointer);
+      dom.cakeCanvas.addEventListener("mousemove", (e) => {
+        if (e.buttons === 1) handleCakePointer(e);
+      });
+      dom.cakeCanvas.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        handleCakePointer(e);
+      }, { passive: false });
+      dom.cakeCanvas.addEventListener("touchmove", (e) => {
+        e.preventDefault();
+        handleCakePointer(e);
+      }, { passive: false });
+    }
+    if (dom.btnBlowAllCandles) {
+      dom.btnBlowAllCandles.addEventListener("click", blowAllCandles);
+    }
+    if (dom.btnSkipCake) {
+      dom.btnSkipCake.addEventListener("click", () => {
+        sfx.init();
+        sfx.playAvatarBoop();
+        if (dom.cakeCeremonyScreen) dom.cakeCeremonyScreen.classList.remove("active");
+        dom.startScreen.classList.add("active");
+        state.liveAvatarDirty = true;
+      });
+    }
+    if (dom.btnReplayCake) {
+      dom.btnReplayCake.addEventListener("click", () => {
+        sfx.init();
+        sfx.playAvatarBoop();
+        resetCakeCandles();
+        if (dom.cakeCeremonyScreen) dom.cakeCeremonyScreen.classList.add("active");
+      });
+    }
+
+    // 🎵 #3: Damla Özel Müzik Kutusu Aç/Kapat Butonu
+    if (dom.btnMusicToggle) {
+      dom.btnMusicToggle.addEventListener("click", () => {
+        sfx.init();
+        sfx.toggleMusicBox();
+        syncMusicButtonUI();
+      });
+    }
+
+    // 💬 #4: WhatsApp Bildirimine Dokununca Kapat ve Konuştur
+    if (dom.whatsappToast) {
+      dom.whatsappToast.addEventListener("click", () => {
+        dom.whatsappToast.classList.add("hidden");
+      });
+    }
+
+    // 📸 #5: Karakter Kartı Büyütme Modalı Kontrolleri
+    if (dom.btnClosePersonaDetailX && dom.dialogPersonaDetail) {
+      dom.btnClosePersonaDetailX.addEventListener("click", () => dom.dialogPersonaDetail.close());
+    }
+    if (dom.btnActivatePersona) {
+      dom.btnActivatePersona.addEventListener("click", () => {
+        const p = state.activePersonaDetail;
+        if (p) {
+          setManitaMood(p.key, p.quote);
+          sfx.playAvatarBoop();
+        }
+        if (dom.dialogPersonaDetail && dom.dialogPersonaDetail.open) {
+          dom.dialogPersonaDetail.close();
+        }
+        if (dom.dialogCollection && dom.dialogCollection.open) {
+          dom.dialogCollection.close();
+        }
+      });
+    }
 
     dom.btnOpenSettingsStart.addEventListener("click", openSettingsModal);
     dom.btnOpenSettings.addEventListener("click", openSettingsModal);
@@ -2697,7 +3419,7 @@
         { mood: "gym", quote: "Sporda 100 kilo basıyorum ama senin parmak darben devirdi beni 😂💪" },
         { mood: "mangal", quote: "Maşayı bıraktım sana bakıyorum Damla'm, hadi patlat bir satır 🔥" },
         { mood: "king", quote: "Doğum günü kraliçesi ne derse o olur, emrindeyim 👑❤️" },
-        { mood: "broke", quote: "Bana her dokunduğunda cüzdanımdan 100 TL eksiliyor gibi hissediyorum 💸" },
+        { mood: "love", quote: "Bana her dokunduğunda kalbim yerinden çıkacakmış gibi çarpıyor 😍❤️" },
         { mood: "party", quote: "İyi ki doğdun sevgilim! Düdüğü senin için çalıyorum 🥳🎂" }
       ];
       const pick = tapOptions[Math.floor(Math.random() * tapOptions.length)];

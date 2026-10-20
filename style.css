@@ -1256,6 +1256,12 @@ dialog::backdrop {
 
 .face-collect-item.unlocked {
   border-color: var(--gold);
+  cursor: pointer;
+  transition: transform 0.16s, box-shadow 0.16s;
+}
+
+.face-collect-item.unlocked:active {
+  transform: scale(0.94);
 }
 
 .face-collect-item.locked img {
@@ -1458,4 +1464,262 @@ dialog::backdrop {
   .joker-btn {
     padding: 6px 8px;
   }
+}
+
+/* ============================================================================
+   4. YENİ ÖZELLİKLER: PASTA & MUM ÜFLEME RİTÜELİ, WHATSAPP BİLDİRİMİ,
+      MÜZİK KUTUSU VE KARAKTER KARTI BÜYÜTME MODALI
+   ============================================================================ */
+
+/* 🕯️ #1: Doğum Günü Pastası & Mum Üfleme Açılış Ekranı */
+.cake-ceremony-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: radial-gradient(circle at 50% 22%, #3a195c 0%, #161d45 55%, #090d22 100%);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.cake-ceremony-screen.active {
+  display: flex;
+  animation: fadeIn 0.35s ease-out;
+}
+
+.cake-card {
+  width: 100%;
+  max-width: 400px;
+  background: linear-gradient(180deg, rgba(44, 29, 89, 0.96) 0%, rgba(20, 27, 64, 0.98) 100%);
+  border: 2.5px solid rgba(255, 204, 41, 0.45);
+  border-radius: 28px;
+  padding: 18px 16px;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.78), 0 0 35px rgba(255, 71, 126, 0.28);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.cake-title {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: var(--gold);
+  text-shadow: 0 3px 0 #703800, 0 6px 14px rgba(0, 0, 0, 0.45);
+  line-height: 1.15;
+}
+
+.cake-subtitle {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #e4ebff;
+  line-height: 1.35;
+}
+
+.cake-subtitle strong {
+  color: var(--gold);
+}
+
+.cake-stage-wrap {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+#cake-canvas {
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  aspect-ratio: 340 / 260;
+  border-radius: 20px;
+  background: radial-gradient(circle at 50% 35%, rgba(255, 204, 41, 0.14) 0%, rgba(12, 17, 42, 0.65) 80%);
+  border: 1.5px solid rgba(255, 255, 255, 0.14);
+  cursor: pointer;
+  touch-action: none;
+}
+
+.cake-candle-status {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.82rem;
+  color: #ffe17d;
+  background: rgba(11, 16, 38, 0.75);
+  border: 1px solid rgba(255, 204, 41, 0.35);
+  padding: 4px 14px;
+  border-radius: 999px;
+}
+
+.cake-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.start-sub-actions {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.start-sub-actions .btn-secondary {
+  font-size: 0.78rem;
+  padding: 9px 8px;
+}
+
+/* 💬 #4: Üstten İnen iOS / WhatsApp Tarzı Canlı Bildirim Banner'ı */
+.whatsapp-toast {
+  position: fixed;
+  top: max(10px, env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 85;
+  width: calc(100% - 24px);
+  max-width: 410px;
+  background: rgba(20, 28, 48, 0.95);
+  backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(37, 211, 102, 0.65);
+  border-radius: 20px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.72), 0 0 20px rgba(37, 211, 102, 0.25);
+  cursor: pointer;
+  animation: waSlideDown 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes waSlideDown {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -28px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+.wa-toast-avatar-wrap {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+}
+
+.wa-toast-avatar-wrap canvas {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 2px solid #25d366;
+  display: block;
+}
+
+.wa-app-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #25d366;
+  color: #fff;
+  font-size: 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.wa-toast-body {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+.wa-toast-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.wa-sender {
+  font-size: 0.76rem;
+  font-weight: 900;
+  color: #25d366;
+}
+
+.wa-time {
+  font-size: 0.64rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.wa-message {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.28;
+}
+
+/* 🎵 #3: Müzik Kutusu Butonu Aktif Durumu */
+.icon-btn.music-on {
+  border-color: var(--gold);
+  background: linear-gradient(135deg, rgba(255, 204, 41, 0.28), rgba(255, 71, 126, 0.28));
+  box-shadow: 0 0 12px rgba(255, 204, 41, 0.45);
+}
+
+/* 📸 #5: Karakter Kartı Büyütme & İnceleme Modalı */
+.persona-detail-card {
+  gap: 10px;
+}
+
+.persona-detail-img-wrap {
+  width: 176px;
+  height: 176px;
+  border-radius: 26px;
+  border: 3.5px solid var(--gold);
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.65), 0 0 24px rgba(255, 204, 41, 0.4);
+  background: #141c42;
+}
+
+.persona-detail-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.persona-detail-power {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #80ffdb;
+  background: rgba(6, 214, 160, 0.14);
+  border: 1px solid rgba(6, 214, 160, 0.35);
+  padding: 6px 12px;
+  border-radius: 12px;
+  width: 100%;
+}
+
+.persona-detail-quote {
+  font-size: 0.84rem;
+  font-weight: 700;
+  font-style: italic;
+  color: #ffffff;
+  background: rgba(11, 16, 38, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 10px 12px;
+  border-radius: 14px;
+  width: 100%;
+  line-height: 1.38;
 }

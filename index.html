@@ -5,12 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Damla Blast" />
   <meta name="theme-color" content="#131936" />
   <title>Damla Blast 👑 Doğum Günü Özel</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icon-180.png" />
+  <link rel="icon" type="image/png" href="assets/icon-180.png" />
+  <link rel="manifest" href="manifest.json" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=6" />
+  <link rel="stylesheet" href="style.css?v=7" />
 </head>
 <body>
   <div id="app-shell" class="app-shell">
@@ -19,6 +23,54 @@
       <span class="bg-orb orb-1"></span>
       <span class="bg-orb orb-2"></span>
       <span class="bg-orb orb-3"></span>
+    </div>
+
+    <!-- =====================================================================
+         0. DOĞUM GÜNÜ PASTASI & MUM ÜFLEME AÇILIŞ RİTÜELİ (#1)
+         ===================================================================== -->
+    <section id="cake-ceremony-screen" class="cake-ceremony-screen active" aria-label="Doğum Günü Pastası">
+      <div class="cake-ceremony-card">
+        <div class="birthday-pill">✨ BİR DİLEK TUT DAMLA! ✨</div>
+
+        <div class="cake-mascot-header">
+          <div class="cake-mascot-avatar">
+            <canvas id="cake-avatar-canvas" width="96" height="96"></canvas>
+            <span class="cake-mascot-badge">🥳</span>
+          </div>
+          <div class="cake-mascot-speech" id="cake-speech-text">
+            "İyi ki doğdun sevgilim! Önce güzel bir dilek tut, sonra pastadaki D-A-M-L-A mumlarına dokunarak (veya parmağını kaydırarak) hepsini söndür 🎂❤️"
+          </div>
+        </div>
+
+        <div class="cake-stage-wrap">
+          <canvas id="cake-canvas" width="340" height="260"></canvas>
+          <div id="cake-candle-status" class="cake-candle-status">🕯️ Yanan Mum: 5 / 5</div>
+        </div>
+
+        <div class="cake-actions">
+          <button id="btn-blow-all-candles" class="btn-primary btn-glow" type="button">
+            <span>🌬️ Dilek Tutup Hepsini Üfle!</span>
+          </button>
+          <button id="btn-skip-cake" class="btn-ghost" type="button">
+            Doğrudan Oyuna Geç →
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ÜSTTEN İNEN SAHTE WHATSAPP BİLDİRİMİ (#4) -->
+    <div id="whatsapp-toast" class="whatsapp-toast hidden" role="status" aria-live="polite">
+      <div class="wa-avatar-wrap">
+        <canvas id="wa-avatar-canvas" width="84" height="84"></canvas>
+        <span class="wa-app-badge">💬</span>
+      </div>
+      <div class="wa-content">
+        <div class="wa-top-row">
+          <span id="wa-sender" class="wa-sender">Metehan ❤️</span>
+          <span id="wa-time" class="wa-time">şimdi • WhatsApp</span>
+        </div>
+        <div id="wa-message" class="wa-message">Aşkım bu ne hız?!</div>
+      </div>
     </div>
 
     <!-- =====================================================================
@@ -43,7 +95,7 @@
             <span class="hero-floating-badge">💐</span>
           </div>
           <div class="hero-quote" id="start-hero-quote">
-            "Doğum günün kutlu olsun aşkım! Puan kastıkça cüzdanım eriyor ve yeni yüzlerim açılıyor ❤️"
+            "Doğum günün kutlu olsun aşkım! Puan yaptıkça sürpriz hediyelerim ve yeni yüzlerim açılıyor ❤️"
           </div>
         </div>
 
@@ -59,6 +111,9 @@
           <button id="btn-start-game" class="btn-primary btn-play" type="button">
             <span>HEMEN OYNA</span>
             <span class="btn-icon">👑</span>
+          </button>
+          <button id="btn-replay-cake" class="btn-secondary" type="button">
+            🎂 Doğum Günü Pastası Mumlarını Yak
           </button>
           <button id="btn-open-settings-start" class="btn-secondary" type="button">
             ⚙️ Fotoğraf &amp; İsim Özelleştir
@@ -94,7 +149,10 @@
             🎁
             <span id="gift-lock-dot" class="gift-dot"></span>
           </button>
-          <button id="btn-sound-toggle" class="icon-btn" type="button" title="Ses Aç/Kapat">
+          <button id="btn-music-toggle" class="icon-btn" type="button" title="Damla Özel Müzik Kutusu Aç/Kapat">
+            🎵
+          </button>
+          <button id="btn-sound-toggle" class="icon-btn" type="button" title="Ses Efektleri Aç/Kapat">
             🔊
           </button>
           <button id="btn-open-settings" class="icon-btn" type="button" title="Fotoğraf & Ayarlar">
@@ -103,19 +161,19 @@
         </div>
       </header>
 
-      <!-- METEHAN'IN CÜZDANI & KARAKTER KATLAMA BARI (4. Madde - Alternatif D) -->
+      <!-- SÜRPRİZ HEDİYE & KARAKTER KATLAMA BARI -->
       <div class="goal-progress-wrap" id="goal-progress-wrap" title="Detaylar için dokun!">
         <div class="goal-progress-labels">
-          <span id="ui-goal-label">💸 Cüzdan: ☕ Kahve Hedefi</span>
-          <span id="ui-goal-numbers" class="goal-reward-pill">0 / 300 Puan</span>
+          <span id="ui-goal-label">🎁 Sıradaki: ☕ Özel Kahve Sözü</span>
+          <span id="ui-goal-numbers" class="goal-reward-pill">0 / 600</span>
         </div>
         <div class="goal-progress-track">
           <div id="ui-goal-fill" class="goal-progress-fill" style="width: 0%"></div>
-          <!-- Aşama Çentikleri: 300 (20%), 650 (43%), 1050 (70%), 1500 (100%) -->
-          <span class="tier-tick" style="left: 20%" title="300 Puan: Kahve + Gym Metehan">☕</span>
-          <span class="tier-tick" style="left: 43%" title="650 Puan: Tatlı + Mangalcı Metehan">🍰</span>
-          <span class="tier-tick" style="left: 70%" title="1050 Puan: Yemek + Ağlayan Metehan">🍽️</span>
-          <span class="tier-tick" style="left: 97%" title="1500 Puan: VIP Kupon + Kral Metehan">👑</span>
+          <!-- Aşama Çentikleri: 600 (17%), 1400 (40%), 2400 (68%), 3500 (97%) -->
+          <span class="tier-tick" style="left: 17%" title="600 Puan: Kahve + Gym Metehan">☕</span>
+          <span class="tier-tick" style="left: 40%" title="1400 Puan: Tatlı + Mangalcı Metehan">🍰</span>
+          <span class="tier-tick" style="left: 68%" title="2400 Puan: Akşam Yemeği + Trip Metehan">🍽️</span>
+          <span class="tier-tick" style="left: 97%" title="3500 Puan: VIP Kupon + Kral Metehan">👑</span>
         </div>
       </div>
 
@@ -320,7 +378,7 @@
           <!-- JS ile doldurulur -->
         </div>
 
-        <div class="guide-title">🎭 12'li Metehan Yüz Koleksiyonu</div>
+        <div class="guide-title">🎭 Metehan Yüz Koleksiyonu (Büyütmek İçin Dokun 🔍)</div>
         <div id="collection-faces-grid" class="collection-faces-grid">
           <!-- JS ile doldurulur -->
         </div>
@@ -328,6 +386,31 @@
         <div class="dialog-actions">
           <button id="btn-close-collection" class="btn-primary" type="button">
             Oyuna Dön 🚀
+          </button>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- D2. METEHAN KARAKTER KARTI BÜYÜTÜP İNCELEME MODALI (#5) -->
+    <dialog id="dialog-persona-detail" class="game-dialog persona-detail-dialog">
+      <div class="dialog-card persona-detail-card">
+        <div id="persona-detail-rarity" class="dialog-pill pill-gold">🌟 ÖZEL METEHAN KARTI 🌟</div>
+        <div class="persona-detail-img-wrap">
+          <img id="persona-detail-img" src="assets/faces/metehan_happy.jpg" alt="Metehan Karakter Kartı" />
+        </div>
+        <h2 id="persona-detail-name" class="dialog-title">Klasik Metehan</h2>
+        <div id="persona-detail-power" class="persona-power-box">
+          ⚡ Özel Güç: Her zaman Damla'yı haklı çıkarır!
+        </div>
+        <p id="persona-detail-quote" class="persona-quote-box">
+          "İyi ki doğdun sevgilim!"
+        </p>
+        <div class="dialog-actions">
+          <button id="btn-activate-persona" class="btn-primary" type="button">
+            🎯 Bu Karakteri Şimdi Konuştur
+          </button>
+          <button id="btn-close-persona-detail" class="btn-secondary" type="button">
+            Koleksiyona Dön ←
           </button>
         </div>
       </div>
@@ -392,7 +475,7 @@
     </dialog>
   </div>
 
-  <script src="config.js?v=6"></script>
-  <script src="game.js?v=6"></script>
+  <script src="config.js?v=7"></script>
+  <script src="game.js?v=7"></script>
 </body>
 </html>
