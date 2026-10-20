@@ -25,7 +25,7 @@ window.DAMLA_CONFIG = {
     party: "assets/faces/metehan_party.jpg",         // 9. Doğum Günü Partisi Şapkalı
     broke: "assets/faces/metehan_broke.jpg",         // 10. Cüzdanı Ağlayan / Hesap Ödeyen
     king: "assets/faces/metehan_king.jpg",           // 11. Kral Tacı / Damat Metehan
-    mindblown: "assets/faces/metehan_mindblown.jpg"  // 12. Aklı Başından Gitmiş (Mega Kombo)
+    mindblown: "assets/faces/metehan_king.jpg"  // 12. Aklı Başından Gitmiş (Mega Kombo)
   },
 
   // 3. KAFA BLOKLARI VE JOKER AYARLARI

@@ -12,6 +12,37 @@
   const STORAGE_KEY_CUSTOM = "damla_blast_custom_config_v1";
   const STORAGE_KEY_UNLOCKED = "damla_blast_unlocked_faces_v1";
 
+  // Güvenli localStorage: Gizli sekme / Instagram-WhatsApp içi tarayıcıda engelliyse
+  // oyun çökmesin, hafızada (memory) tutmaya devam etsin.
+  const memoryStore = {};
+  const safeStorage = {
+    getItem(k) {
+      try {
+        return window.localStorage.getItem(k);
+      } catch (e) {
+        return k in memoryStore ? memoryStore[k] : null;
+      }
+    },
+    setItem(k, v) {
+      memoryStore[k] = String(v);
+      try {
+        window.localStorage.setItem(k, String(v));
+      } catch (e) {
+        // yoksay: hafızada tutuluyor
+      }
+    }
+  };
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, (ch) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    })[ch]);
+  }
+
   // 3D Kristal Blok Renk Paleti (Orijinal Block Blast Tonları)
   const PALETTE = [
     { id: "ruby", main: "#ff3366", light: "#ff85a2", dark: "#a80b35", glow: "rgba(255, 51, 102, 0.55)" },
@@ -214,7 +245,7 @@
 
   function loadSavedCustomizations() {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY_CUSTOM);
+      const raw = safeStorage.getItem(STORAGE_KEY_CUSTOM);
       if (!raw) return;
       const saved = JSON.parse(raw);
       if (saved.boyfriendName) config.boyfriendName = saved.boyfriendName;
@@ -301,6 +332,11 @@
       "guilty"
     ];
     allMoods.forEach((m) => bakeAvatarSpriteForMood(m));
+    // Yeni yüzler hazır: tüm canvas'ları yeniden çizdir (yalnızca init sonrası çağrılır)
+    state.boardDirty = true;
+    state.trayDirty = true;
+    state.liveAvatarDirty = true;
+    if (state.dragging) prepareDragCanvas(state.dragging.piece);
   }
 
   function reloadPhotos(callback) {
@@ -383,7 +419,7 @@
     board: createEmptyBoard(),
     tray: [null, null, null],
     score: 0,
-    bestScore: Number(localStorage.getItem(STORAGE_KEY_BEST) || 0),
+    bestScore: Number(safeStorage.getItem(STORAGE_KEY_BEST) || 0),
     streak: 0,
     noClearMoves: 0,
     bombCount: config.initialBombCount ?? 2,
@@ -401,6 +437,7 @@
     cellSize: 40,
     boardPixelSize: 320,
     timeSec: 0,
+    dt: 1,
     lastMoveTime: performance.now(),
     boardDirty: true,
     boardViewDirty: true,
@@ -410,7 +447,7 @@
 
   // Önceden açılmış yüzleri localStorage'dan yükle
   try {
-    const savedFaces = JSON.parse(localStorage.getItem(STORAGE_KEY_UNLOCKED) || "[]");
+    const savedFaces = JSON.parse(safeStorage.getItem(STORAGE_KEY_UNLOCKED) || "[]");
     savedFaces.forEach((f) => state.unlockedFaces.add(f));
   } catch (e) {
     // yoksay
@@ -1100,7 +1137,7 @@
           t.unlockedFaces.forEach((f) => state.unlockedFaces.add(f));
         }
       }
-      localStorage.setItem(STORAGE_KEY_UNLOCKED, JSON.stringify(Array.from(state.unlockedFaces)));
+      safeStorage.setItem(STORAGE_KEY_UNLOCKED, JSON.stringify(Array.from(state.unlockedFaces)));
 
       const newlyReached = tiers[reachedIndex];
       state.currentTierIndex = reachedIndex;
@@ -1144,7 +1181,7 @@
 
     if (state.score > state.bestScore) {
       state.bestScore = state.score;
-      localStorage.setItem(STORAGE_KEY_BEST, String(state.bestScore));
+      safeStorage.setItem(STORAGE_KEY_BEST, String(state.bestScore));
     }
 
     dom.uiCurrentScore.textContent = state.score.toLocaleString("tr-TR");
@@ -1262,15 +1299,19 @@
   // ============================================================================
   // YANMAMA GARANTİSİ (DOĞUM GÜNÜ TORPİLİ) VE MODALLAR
   // ============================================================================
-  function checkGameOverCondition() {
+  function isBoardStuck() {
     const remainingPieces = state.tray.filter((p) => p !== null);
-    if (remainingPieces.length === 0) return;
+    if (remainingPieces.length === 0) return false;
+    return !remainingPieces.some((p) => canPieceFitAnywhere(state.board, p.matrix));
+  }
 
-    const anyFits = remainingPieces.some((p) => canPieceFitAnywhere(state.board, p.matrix));
-    if (anyFits) return;
+  function checkGameOverCondition() {
+    if (!isBoardStuck()) return;
 
     setTimeout(() => {
-      openTorpilModal();
+      if (isBoardStuck() && !dom.dialogTorpil.open && !dom.dialogGameover.open) {
+        openTorpilModal();
+      }
     }, 350);
   }
 
@@ -1419,8 +1460,13 @@
     dom.trayCanvas.height = trayRect.height * dpr;
 
     state.boardDirty = true;
+    state.boardViewDirty = true;
     state.trayDirty = true;
     state.liveAvatarDirty = true;
+    if (state.dragging) {
+      prepareDragCanvas(state.dragging.piece);
+      syncDragCanvasTransform();
+    }
   }
 
   function draw3DBlock(ctx, x, y, size, colorObj, cellMeta = null, alpha = 1) {
@@ -1608,12 +1654,26 @@
   // ============================================================================
   // ANA RENDER DÖNGÜSÜ (60-120 FPS) & IDLE ZAMANLAYICI
   // ============================================================================
+  let lastFrameTs = 0;
   function renderLoop(timestamp) {
     state.timeSec = timestamp / 1000;
+    // Ekran yenileme hızından bağımsız animasyon: 60Hz = 1.0, 120Hz = 0.5, 30Hz = 2.0
+    const rawDt = lastFrameTs ? (timestamp - lastFrameTs) / 16.667 : 1;
+    state.dt = Math.max(0.25, Math.min(3, rawDt));
+    lastFrameTs = timestamp;
     const dpr = window.devicePixelRatio || 1;
 
+    const anyDialogOpen =
+      dom.dialogTorpil.open ||
+      dom.dialogGameover.open ||
+      dom.dialogCoupon.open ||
+      dom.dialogCollection.open ||
+      dom.dialogSettings.open;
+
     // 9.5 saniye hamle yapılmazsa Metehan laf atsın! (2. Madde)
-    if (
+    if (anyDialogOpen || state.dragging) {
+      state.lastMoveTime = timestamp;
+    } else if (
       !dom.startScreen.classList.contains("active") &&
       timestamp - state.lastMoveTime > 9500
     ) {
@@ -1721,10 +1781,11 @@
     // 5. Patlama Parçacıkları ve Uçan Metehan Kafaları
     for (let i = state.particles.length - 1; i >= 0; i--) {
       const p = state.particles[i];
-      p.x += p.vx;
-      p.y += p.vy;
-      p.vy += 0.22;
-      p.alpha -= 0.022;
+      const dt = state.dt || 1;
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.vy += 0.22 * dt;
+      p.alpha -= 0.022 * dt;
 
       if (p.alpha <= 0) {
         state.particles.splice(i, 1);
@@ -1736,13 +1797,13 @@
       ctx.translate(p.x, p.y);
 
       if (p.type === "shard") {
-        p.rot += p.vRot;
+        p.rot += p.vRot * dt;
         ctx.rotate(p.rot);
         ctx.fillStyle = p.color;
         roundRect(ctx, -p.size / 2, -p.size / 2, p.size, p.size, 2);
         ctx.fill();
       } else if (p.type === "head") {
-        p.rot += p.vRot;
+        p.rot += p.vRot * dt;
         ctx.rotate(p.rot);
         drawBoyfriendAvatar(ctx, 0, 0, p.size / 2, p.mood || "love");
       } else if (p.type === "emoji") {
@@ -1758,9 +1819,10 @@
     // 6. Tahta Üstü Çizgi Roman Konuşma Balonları (5. Madde)
     for (let i = state.floatingTexts.length - 1; i >= 0; i--) {
       const ft = state.floatingTexts[i];
-      ft.y += ft.vy;
-      ft.scale = Math.min(1.05, ft.scale + 0.12);
-      ft.alpha -= 0.018;
+      const fdt = state.dt || 1;
+      ft.y += ft.vy * fdt;
+      ft.scale = Math.min(1.05, ft.scale + 0.12 * fdt);
+      ft.alpha -= 0.018 * fdt;
 
       if (ft.alpha <= 0) {
         state.floatingTexts.splice(i, 1);
@@ -1820,7 +1882,7 @@
       if (state.dragging && state.dragging.trayIndex === i) continue;
 
       if (piece.scaleAnim < 1) {
-        piece.scaleAnim = Math.min(1, piece.scaleAnim + 0.14);
+        piece.scaleAnim = Math.min(1, piece.scaleAnim + 0.14 * (state.dt || 1));
         if (piece.scaleAnim < 1) stillAnimating = true;
       }
 
@@ -1875,31 +1937,43 @@
   // ============================================================================
   // DOKUNMATİK (TOUCH) VE FARE (MOUSE) SÜRÜKLE-BIRAK KONTROLLERİ (0ms GECİKME)
   // ============================================================================
+  // Sürükleme hız çarpanı: 1.0 = blok parmakla birebir (1:1) hareket eder.
+  // Hissiyat ayarı gerekirse yalnızca bu sabiti değiştirmek yeterli.
+  const DRAG_SPEED = 1.0;
+
+  // Aktif sürüklemeyi başlatan parmağı (touch identifier) takip ederek
+  // ikinci bir parmağın sürüklemeyi bozmasını engeller.
+  function findTrackedTouch(list, id) {
+    if (!list) return null;
+    for (let i = 0; i < list.length; i++) {
+      if (list[i].identifier === id) return list[i];
+    }
+    return null;
+  }
+
   function getPointerPos(e) {
+    const trackId = state.dragging ? state.dragging.touchId : null;
+    if (trackId !== null && trackId !== undefined) {
+      const t = findTrackedTouch(e.touches, trackId) || findTrackedTouch(e.changedTouches, trackId);
+      if (t) return { x: t.clientX, y: t.clientY, isTouch: true, id: t.identifier };
+    }
     if (e.touches && e.touches.length > 0) {
-      return { x: e.touches[0].clientX, y: e.touches[0].clientY, isTouch: true };
+      const t = e.touches[0];
+      return { x: t.clientX, y: t.clientY, isTouch: true, id: t.identifier };
     }
     if (e.changedTouches && e.changedTouches.length > 0) {
-      return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY, isTouch: true };
+      const t = e.changedTouches[0];
+      return { x: t.clientX, y: t.clientY, isTouch: true, id: t.identifier };
     }
-    return { x: e.clientX, y: e.clientY, isTouch: false };
+    return { x: e.clientX, y: e.clientY, isTouch: false, id: null };
   }
 
   function computeDraggedCenter(pos, dragState) {
-    if (!pos.isTouch) {
-      return {
-        x: pos.x + dragState.grabOffsetX,
-        y: pos.y - dragState.liftOffset + dragState.grabOffsetY
-      };
-    }
-    // Orijinal Block Blast mobil başparmak ivmesi:
-    // Başparmak ekranın alt yarısında rahatça hareket ederken bloğun tahtanın
-    // en üst satırına ve köşelerine geride kalmadan, seri şekilde yetişmesini sağlar.
     const dx = pos.x - dragState.startX;
     const dy = pos.y - dragState.startY;
     return {
-      x: dragState.startX + dx * 1.24,
-      y: dragState.startY - dragState.liftOffset + dy * 1.55
+      x: dragState.startX + dx * DRAG_SPEED,
+      y: dragState.startY - dragState.liftOffset + dy * DRAG_SPEED
     };
   }
 
@@ -1932,10 +2006,11 @@
     sfx.playPickup();
     state.lastMoveTime = performance.now();
 
-    const liftOffset = pos.isTouch ? 64 : 18;
+    const liftOffset = pos.isTouch ? 58 : 18;
     state.dragging = {
       trayIndex: slotIndex,
       piece,
+      touchId: pos.id ?? null,
       startX: pos.x,
       startY: pos.y,
       grabOffsetX: 0,
@@ -2034,8 +2109,18 @@
     updateDraggingSnap();
   }
 
-  function handleGlobalPointerUp() {
+  function handleGlobalPointerUp(e) {
     if (!state.dragging) return;
+    // Çoklu dokunuşta sürükleyen parmak hâlâ ekrandaysa sürüklemeyi sonlandırma
+    if (
+      e &&
+      e.touches &&
+      state.dragging.touchId !== null &&
+      state.dragging.touchId !== undefined &&
+      findTrackedTouch(e.touches, state.dragging.touchId)
+    ) {
+      return;
+    }
     const { trayIndex, valid, snapRow, snapCol } = state.dragging;
     state.dragging = null;
     syncDragCanvasTransform();
@@ -2072,7 +2157,7 @@
     lb.forEach((item, idx) => {
       const row = document.createElement("div");
       row.className = `lb-row ${idx === 0 ? "rank-1" : ""}`;
-      const displayName = idx === 1 ? `${config.boyfriendName} 🤡` : item.name;
+      const displayName = escapeHtml(idx === 1 ? `${config.boyfriendName} 🤡` : item.name);
       row.innerHTML = `
         <div class="lb-left">
           <span class="lb-badge">${item.badge}</span>
@@ -2099,6 +2184,8 @@
     state.bombTargetingMode = false;
     state.particles = [];
     state.floatingTexts = [];
+    state.couponUnlocked = false;
+    dom.btnGiftCoupon.classList.remove("unlocked");
     state.boardDirty = true;
     state.trayDirty = true;
     state.liveAvatarDirty = true;
@@ -2173,7 +2260,7 @@
     }
 
     try {
-      localStorage.setItem(
+      safeStorage.setItem(
         STORAGE_KEY_CUSTOM,
         JSON.stringify({
           boyfriendName: config.boyfriendName,
@@ -2214,6 +2301,21 @@
 
   function bindEvents() {
     window.addEventListener("resize", resizeCanvases);
+
+    // Android geri tuşu / Esc ile kritik pencereler kapatılıp oyun kilitlenmesin
+    [dom.dialogTorpil, dom.dialogGameover].forEach((dlg) => {
+      dlg.addEventListener("cancel", (e) => e.preventDefault());
+      dlg.addEventListener("close", () => {
+        setTimeout(() => {
+          if (!isBoardStuck() || dom.dialogTorpil.open || dom.dialogGameover.open) return;
+          if (dlg === dom.dialogGameover) {
+            openGameOverModal();
+          } else {
+            openTorpilModal();
+          }
+        }, 60);
+      });
+    });
 
     dom.btnStartGame.addEventListener("click", () => {
       sfx.init();
@@ -2306,11 +2408,20 @@
   }
 
   function init() {
+    // Görselleri beklemeden oyunu hemen başlat; yüzler indikçe otomatik yerine oturur.
+    syncUIFromConfig();
+    bindEvents();
+    startNewGame();
+    requestAnimationFrame(renderLoop);
+
+    const playLabel = dom.btnStartGame.querySelector
+      ? dom.btnStartGame.querySelector("span")
+      : null;
+    const originalLabel = playLabel ? playLabel.textContent : "";
+    if (playLabel) playLabel.textContent = "METEHAN HAZIRLANIYOR…";
+
     reloadPhotos(() => {
-      syncUIFromConfig();
-      bindEvents();
-      startNewGame();
-      requestAnimationFrame(renderLoop);
+      if (playLabel) playLabel.textContent = originalLabel;
     });
   }
 
