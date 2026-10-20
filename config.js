@@ -70,7 +70,7 @@ window.DAMLA_CONFIG = {
       walletStatus: "3. Sürpriz Açıldı 🍽️",
       rewardShort: "🍽️ Akşam Yemeği + Tatlı",
       unlockedFaces: ["crying", "broke"],
-      unlockedPersonaName: "😭 Trip Yemiş & Şaşkın Metehan (3x Puan Bloğu!)",
+      unlockedPersonaName: "😭 Trip Yemiş & Şaşkın Metehan (+150 Bonus Puan Bloğu!)",
       quote: "2400 puan mı?! Harikasın aşkım, romantik akşam yemeği sözüm de kilitlendi! 😍🍽️"
     },
     {
@@ -228,7 +228,7 @@ window.DAMLA_CONFIG = {
       "Maşayı şıklattım, alttaki joker hakkını senin için doldurdum sevgilim! 🔥"
     ],
     eventTrip: [
-      "TRİPLER ÇÖZÜLDÜ! Ağlayan Metehan'ın gönlünü aldın, 3 KAT PUAN! 😭❤️",
+      "TRİPLER ÇÖZÜLDÜ! Ağlayan Metehan'ın gönlünü aldın, +150 BONUS PUAN! 😭❤️",
       "Gözyaşlarım puana dönüştü, tam +150 ekstra puan kaptın kraliçem!"
     ],
 

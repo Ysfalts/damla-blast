@@ -11,6 +11,7 @@
   const STORAGE_KEY_BEST = "damla_blast_best_score_v1";
   const STORAGE_KEY_CUSTOM = "damla_blast_custom_config_v1";
   const STORAGE_KEY_UNLOCKED = "damla_blast_unlocked_faces_v1";
+  const STORAGE_KEY_SAVE = "damla_blast_saved_game_v1";
 
   // Güvenli localStorage: Gizli sekme / Instagram-WhatsApp içi tarayıcıda engelliyse
   // oyun çökmesin, hafızada (memory) tutmaya devam etsin.
@@ -124,7 +125,7 @@
       key: "crying",
       name: "Trip Yemiş 😭",
       unlockScore: 2400,
-      role: "2400 Puan Ödülü • 3 Kat Puan",
+      role: "2400 Puan Ödülü • +150 Bonus Puan",
       power: "😭 Özel Yetenek: Patlatıldığında 'Trip Çözüldü' bonusu olarak +150 ekstra puan kazandırır!",
       quote: "Tamam aşkım bir daha 'fark etmez' demeyeceğim, nereye istersen oraya gidiyoruz! 😭❤️"
     },
@@ -697,6 +698,7 @@
     confetti: [],      // Tam ekran doğum günü konfeti yağmuru
     confettiActive: false,
     shownWaScores: new Set(), // Gösterilmiş WhatsApp bildirim skorları
+    tierJustUnlocked: false, // Bu hamlede yeni hediye açıldıysa o cümle ezilmesin
     activePersonaDetail: null,
     candles: [
       { letter: "D", color: "#ff477e", lit: true, smoke: [] },
@@ -885,14 +887,14 @@
       return { hasFace: forcedMood, eventType: null };
     }
 
-    // Özel Güçlü (Event) Blok Şansı (Gym / Mangal / Trip)
+    // Özel Güçlü (Event) Blok Şansı (Gym / Mangal / Trip) — yalnızca puanla açılmış olanlar
     const eventChance = config.eventBlockChance ?? 0.28;
-    if (Math.random() < eventChance) {
-      const events = [
-        { mood: "gym", eventType: "gym", badge: "💪" },
-        { mood: "mangal", eventType: "mangal", badge: "🔥" },
-        { mood: "crying", eventType: "trip", badge: "😭" }
-      ];
+    const events = [
+      { mood: "gym", eventType: "gym", badge: "💪" },
+      { mood: "mangal", eventType: "mangal", badge: "🔥" },
+      { mood: "crying", eventType: "trip", badge: "😭" }
+    ].filter((ev) => state.unlockedFaces.has(ev.mood));
+    if (events.length > 0 && Math.random() < eventChance) {
       const chosenEv = events[Math.floor(Math.random() * events.length)];
       return {
         hasFace: chosenEv.mood,
@@ -1094,6 +1096,7 @@
     if (!canPlaceAt(state.board, piece.matrix, startR, startC)) return false;
 
     state.lastMoveTime = performance.now();
+    state.tierJustUnlocked = false;
     let placedBlocks = 0;
 
     for (let r = 0; r < piece.rows; r++) {
@@ -1136,7 +1139,9 @@
         (startR + piece.rows === GRID_SIZE && startC === 0) ||
         (startR + piece.rows === GRID_SIZE && startC + piece.cols === GRID_SIZE);
 
-      if (occupancy >= 0.65) {
+      if (state.tierJustUnlocked) {
+        // Yeni hediye cümlesi ekranda kalsın
+      } else if (occupancy >= 0.65) {
         setManitaMood("panic");
       } else if (state.noClearMoves >= 3) {
         setManitaMood(state.noClearMoves % 2 === 0 ? "crying" : "guilty");
@@ -1156,6 +1161,7 @@
       checkGameOverCondition();
     }
 
+    saveGameState();
     return true;
   }
 
@@ -1269,7 +1275,7 @@
     }
 
     if (triggeredEvents.has("trip")) {
-      // Trip Bloğu: 3 Kat Ekstra Puan (+150)
+      // Trip Bloğu: +150 Ekstra Puan
       eventBonusScore += 150;
       specialMood = "crying";
       specialQuote = quoteDeck.pick("eventTrip");
@@ -1309,7 +1315,9 @@
       }
     }
 
-    setManitaMood(targetMood, quote);
+    if (!state.tierJustUnlocked) {
+      setManitaMood(targetMood, quote);
+    }
 
     if (totalLines >= 2 || state.streak >= 2 || triggeredEvents.size > 0) {
       triggerBoardShake();
@@ -1513,12 +1521,13 @@
       dom.waSenderName.textContent = waItem.sender || `${bf} ❤️`;
     }
     if (dom.waMessageText) {
-      dom.waMessageText.textContent = waItem.text || "";
+      dom.waMessageText.textContent = waItem.message || waItem.text || "";
     }
     if (dom.waAvatarCanvas) {
       const ctx = dom.waAvatarCanvas.getContext("2d");
-      ctx.clearRect(0, 0, 64, 64);
-      drawBoyfriendAvatar(ctx, 32, 32, 29, waItem.mood || "love", state.timeSec);
+      const size = dom.waAvatarCanvas.width;
+      ctx.clearRect(0, 0, size, size);
+      drawBoyfriendAvatar(ctx, size / 2, size / 2, size / 2 - 2, waItem.avatarMood || waItem.mood || "love");
     }
 
     dom.whatsappToast.classList.remove("hidden");
@@ -1568,6 +1577,7 @@
       state.currentTierIndex = reachedIndex;
 
       if (newlyReached) {
+        state.tierJustUnlocked = true;
         sfx.playCashRegister();
         spawnConfettiBurst(85);
         const unlockedFaceKey =
@@ -1617,9 +1627,11 @@
     dom.uiCurrentScore.classList.add("score-pop");
 
     if (state.score >= state.nextBonusScore) {
-      state.bombCount++;
-      state.rerollCount++;
-      state.nextBonusScore += config.bonusJokerEveryScore || 900;
+      while (state.score >= state.nextBonusScore) {
+        state.bombCount++;
+        state.rerollCount++;
+        state.nextBonusScore += config.bonusJokerEveryScore || 900;
+      }
       updateJokerButtons();
     }
 
@@ -1665,6 +1677,7 @@
     state.bombTargetingMode = false;
     state.bombHoverCell = null;
     state.lastMoveTime = performance.now();
+    state.tierJustUnlocked = false;
     updateJokerButtons();
 
     let cleared = 0;
@@ -1698,9 +1711,10 @@
     triggerBoardShake();
     addScore(cleared * 25 + 50);
     const quote = quoteDeck.pick("bombUsed");
-    setManitaMood("sorry", quote);
+    if (!state.tierJustUnlocked) setManitaMood("sorry", quote);
     spawnFloatingComicText("💐 ÖZÜR DİLERİM!", (centerC + 0.5) * state.cellSize, (centerR + 0.5) * state.cellSize);
     showComboShowcase("ÖZÜR DİLERİM AŞKIM! 💐", quote, "sorry");
+    saveGameState();
   }
 
   // Joker 2: "Ben Hallederim Aşkım" (1x1 Kolay Bloklar)
@@ -1721,6 +1735,7 @@
     const quote = quoteDeck.pick("rerollUsed");
     setManitaMood("cool", quote);
     showComboShowcase("BEN HALLEDERİM! 😎", quote, "cool");
+    saveGameState();
   }
 
   // ============================================================================
@@ -1786,6 +1801,7 @@
     triggerBoardShake();
     setManitaMood("king", "Kraliçem her zaman haklıdır! Tahtayı senin için tertemiz açtım 👑❤️");
     showComboShowcase("TORPİL AKTİF! 👑", "SEN HEP HAKLISIN AŞKIM!", "king");
+    saveGameState();
   }
 
   function openGameOverModal() {
@@ -1950,13 +1966,35 @@
     );
 
     ctx.fillStyle = "#ffffff";
-    ctx.font = "700 26px 'Nunito', sans-serif";
     const rewardText =
       (config.coupon && config.coupon.rewardText) ||
       "Bu kuponla Metehan'dan 1 adet lüks akşam yemeği, sınırsız kahve/tatlı ve tartışmasız %100 HAKLILIK hakkı kazandın!";
-    const wrapped = wrapCanvasLines(ctx, rewardText, W - 260);
-    wrapped.slice(0, 4).forEach((ln, idx) => {
-      ctx.fillText(ln, W / 2, 972 + idx * 38);
+    // Satır sonlarını koru (her paragrafı ayrı sar), boş satırları yarım boşluk say;
+    // metin kutuya sığana kadar yazı boyutunu küçült.
+    const paragraphs = String(rewardText).split(/\n/);
+    const maxTextH = 180;
+    let fontSize = 26;
+    let layout = [];
+    for (; fontSize >= 14; fontSize -= 1) {
+      ctx.font = `700 ${fontSize}px 'Nunito', sans-serif`;
+      const lineH = fontSize * 1.38;
+      layout = [];
+      let h = 0;
+      paragraphs.forEach((para) => {
+        if (para.trim() === "") {
+          if (layout.length > 0) h += lineH * 0.5;
+          return;
+        }
+        wrapCanvasLines(ctx, para.trim(), W - 240).forEach((ln) => {
+          layout.push({ text: ln, y: h });
+          h += lineH;
+        });
+      });
+      if (h <= maxTextH) break;
+    }
+    const textTop = 950 + fontSize * 0.69;
+    layout.forEach((ln) => {
+      if (ln.y <= maxTextH) ctx.fillText(ln.text, W / 2, textTop + ln.y);
     });
 
     // 7. Resmi Mühür Damgası
@@ -2344,6 +2382,8 @@
   // ============================================================================
   let lastFrameTs = 0;
   function renderLoop(timestamp) {
+    // Sonraki kareyi en başta iste: bir çizim hatası döngüyü durdurup oyunu dondurmasın
+    requestAnimationFrame(renderLoop);
     state.timeSec = timestamp / 1000;
     // Ekran yenileme hızından bağımsız animasyon: 60Hz = 1.0, 120Hz = 0.5, 30Hz = 2.0
     const rawDt = lastFrameTs ? (timestamp - lastFrameTs) / 16.667 : 1;
@@ -2383,8 +2423,6 @@
     renderTray(dpr);
     renderLiveAvatars();
     renderConfetti(dpr);
-
-    requestAnimationFrame(renderLoop);
   }
 
   function renderBoard(dpr) {
@@ -2583,8 +2621,13 @@
         if (piece.scaleAnim < 1) stillAnimating = true;
       }
 
-      const maxDim = Math.max(piece.rows, piece.cols);
-      const baseCell = Math.min(22, (slotWidth - 22) / Math.max(3, maxDim), (rect.height - 16) / maxDim);
+      // Tepsideki bloklar tahta hücresinin ~%62'si kadar; küçük ekranlarda slota sığacak kadar küçülür
+      const baseCell = Math.min(state.cellSize * 0.62, (slotWidth - 12) / piece.cols, (rect.height - 12) / piece.rows);
+      if (!(baseCell > 2)) {
+        // Tepsi henüz ölçülemedi (yerleşim/ekran döndürme anı): sonraki karede tekrar dene
+        stillAnimating = true;
+        continue;
+      }
       const cell = baseCell * piece.scaleAnim;
 
       const pw = piece.cols * cell;
@@ -3199,6 +3242,106 @@
 
     spawnNewTray();
     resizeCanvases();
+    saveGameState();
+  }
+
+  // ============================================================================
+  // DEVAM EDEN OYUNU KAYDETME / GERİ YÜKLEME (Sayfa yenilenince oyun kaybolmasın)
+  // ============================================================================
+  function serializeCell(cell) {
+    if (!cell) return null;
+    return { color: cell.color.id, hasFace: cell.hasFace, eventType: cell.eventType || null, badge: cell.badge || null };
+  }
+
+  function findPaletteColor(id) {
+    return PALETTE.find((p) => p.id === id) || PALETTE[0];
+  }
+
+  function saveGameState() {
+    try {
+      safeStorage.setItem(
+        STORAGE_KEY_SAVE,
+        JSON.stringify({
+          board: state.board.map((row) => row.map(serializeCell)),
+          tray: state.tray.map((p) =>
+            p ? { matrix: p.matrix, cellDataMap: p.cellDataMap, color: p.color.id } : null
+          ),
+          score: state.score,
+          streak: state.streak,
+          noClearMoves: state.noClearMoves,
+          bombCount: state.bombCount,
+          rerollCount: state.rerollCount,
+          nextBonusScore: state.nextBonusScore,
+          currentTierIndex: state.currentTierIndex,
+          couponUnlocked: state.couponUnlocked,
+          shownWaScores: Array.from(state.shownWaScores)
+        })
+      );
+    } catch (e) {
+      // yoksay: kayıt yapılamazsa oyun yine de oynanır
+    }
+  }
+
+  function restoreGameState() {
+    try {
+      const raw = safeStorage.getItem(STORAGE_KEY_SAVE);
+      if (!raw) return false;
+      const saved = JSON.parse(raw);
+      if (!Array.isArray(saved.board) || saved.board.length !== GRID_SIZE || !Array.isArray(saved.tray)) {
+        return false;
+      }
+
+      state.board = saved.board.map((row) =>
+        row.map((cell) =>
+          cell
+            ? { color: findPaletteColor(cell.color), hasFace: cell.hasFace, eventType: cell.eventType, badge: cell.badge }
+            : null
+        )
+      );
+      state.tray = [0, 1, 2].map((i) => {
+        const p = saved.tray[i];
+        if (!p || !Array.isArray(p.matrix)) return null;
+        return {
+          matrix: p.matrix,
+          cellDataMap: p.cellDataMap,
+          color: findPaletteColor(p.color),
+          rows: p.matrix.length,
+          cols: p.matrix[0].length,
+          scaleAnim: 0.1
+        };
+      });
+      state.score = Number(saved.score) || 0;
+      state.streak = Number(saved.streak) || 0;
+      state.noClearMoves = Number(saved.noClearMoves) || 0;
+      state.bombCount = Number(saved.bombCount) || 0;
+      state.rerollCount = Number(saved.rerollCount) || 0;
+      state.nextBonusScore = Number(saved.nextBonusScore) || config.bonusJokerEveryScore || 900;
+      state.currentTierIndex = Number(saved.currentTierIndex) || 0;
+      state.couponUnlocked = !!saved.couponUnlocked;
+      state.shownWaScores = new Set(saved.shownWaScores || []);
+      state.bombTargetingMode = false;
+      state.particles = [];
+      state.floatingTexts = [];
+      state.boardDirty = true;
+      state.trayDirty = true;
+      state.liveAvatarDirty = true;
+      state.lastMoveTime = performance.now();
+
+      if (state.tray.every((p) => p === null)) spawnNewTray();
+
+      dom.btnGiftCoupon.classList.toggle("unlocked", state.couponUnlocked);
+      dom.uiCurrentScore.textContent = state.score.toLocaleString("tr-TR");
+      updateWalletProgressAndTiers();
+      updateStreakBadge();
+      updateJokerButtons();
+      setManitaMood("party", quoteDeck.pick("idle"));
+      resizeCanvases();
+      // Sıkışmış kayıt varsa torpil penceresi "HEMEN OYNA"ya basılınca açılır
+      return true;
+    } catch (e) {
+      console.warn("Kayıtlı oyun okunamadı:", e);
+      return false;
+    }
   }
 
   function openSettingsModal() {
@@ -3326,6 +3469,7 @@
       state.lastMoveTime = performance.now();
       dom.startScreen.classList.remove("active");
       resizeCanvases();
+      checkGameOverCondition();
     });
 
     // 🕯️ #1: Pasta ve Mum Üfleme Kontrolleri
@@ -3511,7 +3655,7 @@
     // Görselleri beklemeden oyunu hemen başlat; yüzler indikçe otomatik yerine oturur.
     syncUIFromConfig();
     bindEvents();
-    startNewGame();
+    if (!restoreGameState()) startNewGame();
     requestAnimationFrame(renderLoop);
 
     const playLabel = dom.btnStartGame.querySelector
