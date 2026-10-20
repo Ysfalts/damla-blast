@@ -235,6 +235,135 @@
   }
 
   // ============================================================================
+  // iOS SÜRÜKLEME TİTREŞİMİ (iOS 18+ ve 26.5+)
+  // iOS 26.5'ten beri koddan tetiklenen switch tıkları çalmıyor. Ama parmak bir switch'in
+  // başparmağını sürüklerken switch'in ortasını geçtiğinde iOS yine tık çalıyor ve bunun için
+  // tıklama gerekmiyor. Tepsiyi görünmez, çok geniş bir switch ile kaplıyoruz; dokunuş onun
+  // üstünde başlıyor. Tık istendiğinde switch'i, parmak ortanın öbür tarafında kalacak şekilde
+  // kaydırıyoruz; bir sonraki touchmove ortayı geçiyor ve iOS tık çalıyor.
+  // Kısıtlar: WebKit takibe dokunuştan ~200ms sonra başlar (önceki tıklar çalmaz) ve parmak
+  // kalkarken tık çalınamaz. Uyarlandığı yer: github.com/ilyassesalama/vibration (src/drag.ts, MIT).
+  // ============================================================================
+  const DRAG_HAPTIC_WIDTH = 4000;
+  const DRAG_HAPTIC_SIDES = [DRAG_HAPTIC_WIDTH / 4, (DRAG_HAPTIC_WIDTH * 3) / 4];
+  const DRAG_HAPTIC_HOLD = 250;
+  const DRAG_HAPTIC_REST =
+    "-webkit-appearance:none;appearance:none;position:absolute;left:0;top:0;width:100%;height:100%;margin:0;padding:0;border:0;opacity:0;pointer-events:auto";
+
+  const dragHaptic = { host: null, toggle: null, drag: null, restoreTimer: null, requested: 0, crossed: 0 };
+
+  function findTouchById(list, id) {
+    for (let i = 0; i < list.length; i++) {
+      if (list[i].identifier === id) return list[i];
+    }
+    return null;
+  }
+
+  function placeDragHapticSwitch(d) {
+    const box = dragHaptic.host.getBoundingClientRect();
+    const scale = box.width / dragHaptic.host.offsetWidth || 1;
+    const left = (d.x - box.left) / scale - DRAG_HAPTIC_SIDES[d.side];
+    dragHaptic.toggle.style.cssText =
+      `-webkit-appearance:none;appearance:none;position:absolute;top:0;left:${left}px;width:${DRAG_HAPTIC_WIDTH}px;height:8px;` +
+      "margin:0;padding:0;border:0;opacity:0;pointer-events:none";
+    // Switch, dokunuşu işlerken yerleşimini senkron okur
+    void dragHaptic.toggle.offsetWidth;
+  }
+
+  function crossDragHapticSwitch(d) {
+    d.side = d.side === 0 ? 1 : 0;
+    d.crossed = true;
+    dragHaptic.crossed++;
+    placeDragHapticSwitch(d);
+  }
+
+  function attachDragHaptic(element) {
+    const host = document.createElement("div");
+    host.setAttribute("aria-hidden", "true");
+    host.style.cssText =
+      "position:absolute;inset:0;display:block;z-index:5;touch-action:none;-webkit-tap-highlight-color:transparent;" +
+      "-webkit-user-select:none;user-select:none;-webkit-touch-callout:none";
+    const toggle = document.createElement("input");
+    toggle.type = "checkbox";
+    toggle.setAttribute("switch", "");
+    toggle.tabIndex = -1;
+    toggle.style.cssText = DRAG_HAPTIC_REST;
+    host.appendChild(toggle);
+    element.appendChild(host);
+    dragHaptic.host = host;
+    dragHaptic.toggle = toggle;
+
+    const opts = { capture: true, passive: true };
+    window.addEventListener(
+      "touchstart",
+      (e) => {
+        // WebKit bir switch'i tek parmakla takip eder
+        if (e.target !== host || dragHaptic.drag || e.targetTouches.length !== 1) return;
+        const t = e.changedTouches[0];
+        dragHaptic.drag = {
+          touch: t.identifier,
+          startedAt: performance.now(),
+          x: t.clientX,
+          side: 0,
+          pending: false,
+          move: null,
+          crossed: false
+        };
+        placeDragHapticSwitch(dragHaptic.drag);
+      },
+      opts
+    );
+    window.addEventListener(
+      "touchmove",
+      (e) => {
+        const d = dragHaptic.drag;
+        if (!d || e.target !== host) return;
+        const t = findTouchById(e.changedTouches, d.touch);
+        if (!t) return;
+        d.x = t.clientX;
+        d.move = e;
+        d.crossed = false;
+        if (d.pending && performance.now() - d.startedAt >= DRAG_HAPTIC_HOLD) {
+          d.pending = false;
+          crossDragHapticSwitch(d);
+        } else {
+          placeDragHapticSwitch(d);
+        }
+      },
+      opts
+    );
+    const onEnd = (e) => {
+      const d = dragHaptic.drag;
+      if (!d || e.target !== host || findTouchById(e.touches, d.touch)) return;
+      dragHaptic.drag = null;
+      // touchend WebKit'e ulaşmadan switch'i gizle: tıklama ve bırakma tıkı olmasın.
+      // WebKit'in 200ms zamanlayıcısı dolana kadar gizli kalsın ki kısa dokunuş takip başlatmasın.
+      toggle.style.display = "none";
+      void toggle.offsetWidth;
+      clearTimeout(dragHaptic.restoreTimer);
+      dragHaptic.restoreTimer = setTimeout(() => {
+        toggle.style.cssText = DRAG_HAPTIC_REST;
+      }, Math.max(0, d.startedAt + DRAG_HAPTIC_HOLD + 50 - performance.now()));
+    };
+    window.addEventListener("touchend", onEnd, opts);
+    window.addEventListener("touchcancel", onEnd, opts);
+  }
+
+  // Sürükleme sırasında bir tık iste (tepsiden başlayan iOS sürüklemesi yoksa hiçbir şey yapmaz)
+  function requestDragHapticTick() {
+    const d = dragHaptic.drag;
+    if (!d || !sfx.enabled) return;
+    dragHaptic.requested++;
+    if (performance.now() - d.startedAt < DRAG_HAPTIC_HOLD) return;
+    if (window.event && window.event === d.move) {
+      // Aynı touchmove işlenirken istendi: switch konumu dinleyiciler bitince okunur
+      if (!d.crossed) crossDragHapticSwitch(d);
+    } else {
+      d.pending = true;
+    }
+  }
+
+  // ============================================================================
   // SES EFEKT MOTORU & DAMLA ÖZEL MÜZİK KUTUSU (Web Audio API - Kalimba & SFX)
   // ============================================================================
   class SoundEngine {
@@ -2501,6 +2630,7 @@
     const rawDt = lastFrameTs ? (timestamp - lastFrameTs) / 16.667 : 1;
     state.dt = Math.max(0.25, Math.min(3, rawDt));
     lastFrameTs = timestamp;
+    if (debugPanel.on) debugOnFrame(timestamp);
     const dpr = window.devicePixelRatio || 1;
 
     const anyDialogOpen =
@@ -3140,7 +3270,15 @@
     };
   }
 
+  let lastTouchStartTs = 0;
   function handleTrayPointerDown(e) {
+    const isTouchEvent = !!e.touches;
+    if (isTouchEvent) {
+      lastTouchStartTs = performance.now();
+    } else if (performance.now() - lastTouchStartTs < 1000) {
+      // iOS dokunuştan sonra sahte mousedown üretebilir (haptic yüzeyinde touchstart engellenmiyor)
+      return;
+    }
     if (state.bombTargetingMode) {
       state.bombTargetingMode = false;
       state.boardViewDirty = true;
@@ -3165,7 +3303,9 @@
     const piece = state.tray[slotIndex];
     if (!piece) return;
 
-    e.preventDefault();
+    // iOS titreşim yüzeyinde touchstart engellenmemeli: engellenirse WebKit switch'i takip etmez.
+    // Kaydırmayı zaten touch-action:none engelliyor.
+    if (!(dragHaptic.host && e.target === dragHaptic.host)) e.preventDefault();
     sfx.playPickup();
     state.lastMoveTime = performance.now();
 
@@ -3232,6 +3372,8 @@
       const { fullRows, fullCols } = findCompletedLines(tempBoard);
       state.dragging.previewFullRows = fullRows;
       state.dragging.previewFullCols = fullCols;
+      // Blok yeni bir kareye oturdu: iPhone'da küçük bir tık
+      requestDragHapticTick();
     } else {
       state.dragging.snapRow = -1;
       state.dragging.snapCol = -1;
@@ -3261,7 +3403,9 @@
     }
 
     if (!state.dragging) return;
-    e.preventDefault();
+    // iOS titreşim yüzeyinde touchmove engellenmemeli (switch takibi bozulur); kaydırmayı touch-action:none engelliyor
+    if (!(dragHaptic.host && e.target === dragHaptic.host)) e.preventDefault();
+    if (debugPanel.on) debugOnMove(e);
     const pos = getPointerPos(e);
     const nextPos = computeDraggedCenter(pos, state.dragging);
     state.dragging.x = nextPos.x;
@@ -3583,6 +3727,7 @@
 
   function bindEvents() {
     window.addEventListener("resize", resizeCanvases);
+    if (IS_IOS) attachDragHaptic(dom.trayContainer);
 
     // Android geri tuşu / Esc ile kritik pencereler kapatılıp oyun kilitlenmesin
     [dom.dialogTorpil, dom.dialogGameover].forEach((dlg) => {
@@ -3792,6 +3937,114 @@
   }
 
   // ============================================================================
+  // GİZLİ TEST PANELİ (Ekran kare hızı, dokunma olay hızı, olay→kare gecikmesi, titreşim)
+  // Açmak/kapatmak: giriş ekranındaki "sürüm" yazısına art arda 5 kez dokun veya adrese ?debug=1 ekle.
+  // ============================================================================
+  const STORAGE_KEY_DEBUG = "damla_blast_debug_panel";
+  const debugPanel = {
+    on: false,
+    el: null,
+    frames: [], // son 1 sn'deki kare zaman damgaları
+    moves: [], // son 1 sn'deki touchmove zaman damgaları
+    pendingMoveTs: null, // henüz bir kareye yansımamış en eski hareketin zamanı
+    delays: [], // olay→kare gecikmeleri (ms)
+    lastRender: 0
+  };
+
+  function debugOnMove(e) {
+    const now = performance.now();
+    debugPanel.moves.push(now);
+    if (debugPanel.pendingMoveTs === null) {
+      // touchmove'un tarayıcıya ulaştığı an; yoksa işleyicinin çalıştığı an
+      const ts = e.timeStamp && e.timeStamp <= now ? e.timeStamp : now;
+      debugPanel.pendingMoveTs = ts;
+    }
+  }
+
+  function debugOnFrame(ts) {
+    const now = performance.now();
+    debugPanel.frames.push(now);
+    if (debugPanel.pendingMoveTs !== null) {
+      const delay = now - debugPanel.pendingMoveTs;
+      // Sekme arka plandayken biriken uç değerleri sayma
+      if (delay < 1000) debugPanel.delays.push(delay);
+      if (debugPanel.delays.length > 60) debugPanel.delays.shift();
+      debugPanel.pendingMoveTs = null;
+    }
+    const cutoff = now - 1000;
+    while (debugPanel.frames.length && debugPanel.frames[0] < cutoff) debugPanel.frames.shift();
+    while (debugPanel.moves.length && debugPanel.moves[0] < cutoff) debugPanel.moves.shift();
+    if (now - debugPanel.lastRender < 400) return;
+    debugPanel.lastRender = now;
+
+    let worst = 0;
+    for (let i = 1; i < debugPanel.frames.length; i++) {
+      worst = Math.max(worst, debugPanel.frames[i] - debugPanel.frames[i - 1]);
+    }
+    const sortedDelays = debugPanel.delays.slice().sort((a, b) => a - b);
+    const medianDelay = sortedDelays.length ? sortedDelays[Math.floor(sortedDelays.length / 2)] : 0;
+    const iosMatch = /OS (\d+)[_.](\d+)/.exec(navigator.userAgent);
+    const hapticMode = IS_IOS
+      ? "iOS sürükleme switch"
+      : typeof navigator.vibrate === "function"
+      ? "navigator.vibrate"
+      : "yok";
+    debugPanel.el.textContent = [
+      `sürüm ${APP_VERSION || "?"}  ·  ${iosMatch ? `iOS ${iosMatch[1]}.${iosMatch[2]}` : "iOS değil"}`,
+      `ekran: ${debugPanel.frames.length} kare/sn  (en kötü ${worst.toFixed(0)} ms)`,
+      `dokunma: ${debugPanel.moves.length} hareket/sn`,
+      `olay→kare: ${medianDelay.toFixed(1)} ms (medyan)`,
+      `dpr ${window.devicePixelRatio || 1}  ·  hız x${DRAG_SPEED_TOUCH}`,
+      `titreşim: ${hapticMode}`,
+      `sürükleme tık: ${dragHaptic.crossed} / ${dragHaptic.requested} istek`
+    ].join("\n");
+  }
+
+  function setDebugPanel(on) {
+    debugPanel.on = on;
+    try {
+      if (on) window.localStorage.setItem(STORAGE_KEY_DEBUG, "1");
+      else window.localStorage.removeItem(STORAGE_KEY_DEBUG);
+    } catch (e) {
+      // yoksay
+    }
+    if (on && !debugPanel.el) {
+      const el = document.createElement("div");
+      el.className = "debug-panel";
+      document.body.appendChild(el);
+      debugPanel.el = el;
+    }
+    if (debugPanel.el) debugPanel.el.style.display = on ? "block" : "none";
+  }
+
+  function initDebugPanel() {
+    let stored = false;
+    try {
+      stored = window.localStorage.getItem(STORAGE_KEY_DEBUG) === "1";
+    } catch (e) {
+      // yoksay
+    }
+    if (/[?&]debug=1/.test(location.search) || stored) setDebugPanel(true);
+
+    const versionEl = document.getElementById("app-version");
+    if (!versionEl) return;
+    let taps = 0;
+    let tapTimer = null;
+    versionEl.addEventListener("click", () => {
+      taps++;
+      clearTimeout(tapTimer);
+      if (taps >= 5) {
+        taps = 0;
+        setDebugPanel(!debugPanel.on);
+      } else {
+        tapTimer = setTimeout(() => {
+          taps = 0;
+        }, 1800);
+      }
+    });
+  }
+
+  // ============================================================================
   // SÜRÜM ETİKETİ & OTOMATİK GÜNCELLEME
   // Ana ekrana eklenmiş uygulama veya açık kalan Safari sekmesi, açılınca sayfayı yeniden
   // indirmeden eski sürümü göstermeye devam edebiliyor. Açılışta ve uygulama öne geldiğinde
@@ -3852,6 +4105,7 @@
 
     const versionEl = document.getElementById("app-version");
     if (versionEl && APP_VERSION) versionEl.textContent = `sürüm ${APP_VERSION}`;
+    initDebugPanel();
     setTimeout(checkForNewVersion, 1500);
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") checkForNewVersion();
