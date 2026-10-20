@@ -9,7 +9,7 @@ window.DAMLA_CONFIG = {
   girlfriendName: "Damla",
   boyfriendName: "Metehan",
   birthdayAgeText: "🎂 İYİ Kİ DOĞDUN DAMLA! 🎂",
-  targetBirthdayScore: 3500,
+  targetBirthdayScore: 10000,
 
   // 2. METEHAN 12'Lİ YÜZ & KARAKTER PAKETİ
   photos: {
@@ -47,68 +47,68 @@ window.DAMLA_CONFIG = {
       quote: "Bakalım doğum günü sürprizlerinin hepsini açabilecek misin Damla'm 😎❤️"
     },
     {
-      score: 600,
+      score: 2000,
       title: "1. Sürpriz: ☕ Kahve Sözü Açıldı!",
       walletStatus: "1. Sürpriz Açıldı ☕",
       rewardShort: "☕ Özel Kahve Sözü",
       unlockedFaces: ["gym"],
       unlockedPersonaName: "💪 Gym Bro Metehan (Dambıl Bloğu Aktif!)",
-      quote: "600 puanı devirdin! Kahveler benden, ayrıca Gym Bro Metehan tahtaya indi 💪"
+      quote: "İlk sürprizi açtın! Kahveler benden, ayrıca Gym Bro Metehan tahtaya indi 💪"
     },
     {
-      score: 1400,
+      score: 4000,
       title: "2. Sürpriz: 🍰 Tatlı + Kahve Keyfi!",
       walletStatus: "2. Sürpriz Açıldı 🍰",
       rewardShort: "🍰 Kahve + İstediğin Tatlı",
       unlockedFaces: ["mangal"],
       unlockedPersonaName: "🔥 Mangalcı Metehan (Joker Dolduran Blok Aktif!)",
-      quote: "1400 puan! Kahvenin yanına en sevdiğin tatlı da eklendi, Mangalcı Metehan görevde 🔥"
+      quote: "Durdurulamıyorsun! Kahvenin yanına en sevdiğin tatlı da eklendi, Mangalcı Metehan görevde 🔥"
     },
     {
-      score: 2400,
+      score: 7000,
       title: "3. Sürpriz: 🍽️ Romantik Akşam Yemeği!",
       walletStatus: "3. Sürpriz Açıldı 🍽️",
       rewardShort: "🍽️ Akşam Yemeği + Tatlı",
       unlockedFaces: ["crying", "broke"],
       unlockedPersonaName: "😭 Trip Yemiş & Şaşkın Metehan (+150 Bonus Puan Bloğu!)",
-      quote: "2400 puan mı?! Harikasın aşkım, romantik akşam yemeği sözüm de kilitlendi! 😍🍽️"
+      quote: "Bu skor ne böyle?! Harikasın aşkım, romantik akşam yemeği sözüm de kilitlendi! 😍🍽️"
     },
     {
-      score: 3500,
+      score: 10000,
       title: "FİNAL: 👑 VIP Doğum Günü Kuponu!",
       walletStatus: "Tüm Sürprizler Açıldı 👑",
       rewardShort: "👑 VIP Tam Paket + %100 Haklılık",
       unlockedFaces: ["king", "mindblown"],
       unlockedPersonaName: "👑 Kraliyet Damat Metehan (Tüm Yüzler Açıldı!)",
-      quote: "TEBRİKLER AŞKIM! 3500 puanla rekorları altüst ettin, VIP Doğum Günü Kuponun hazır! 🎂❤️"
+      quote: "TEBRİKLER AŞKIM! Rekorları altüst ettin, VIP Doğum Günü Kuponun hazır! 🎂❤️"
     }
   ],
 
   // 4B. ÜSTTEN KAYARAK İNEN SAHTE WHATSAPP BİLDİRİMLERİ (Geniş Skor Aralıkları)
   whatsappNotifications: [
     {
-      score: 800,
+      score: 2500,
       sender: "Metehan ❤️",
       time: "şimdi",
       avatarMood: "love",
       message: "Aşkım bu ne hız?! Daha ısınma turundaydık, rekorumu tarihe gömdün resmen 😍👑"
     },
     {
-      score: 1800,
+      score: 5500,
       sender: "Metehan ❤️",
       time: "şimdi",
       avatarMood: "gym",
       message: "Sporda 100 kilo basıyorum ama senin şu blokları patlatma gücün karşısında saygıyla eğiliyorum 💪😂"
     },
     {
-      score: 3000,
+      score: 8500,
       sender: "Metehan ❤️",
       time: "şimdi",
       avatarMood: "sorry",
       message: "Annem aradı 'Damla yine mi haklı çıktı' diye soruyor, 'Evet anne her zamanki gibi' dedim 🥰👑"
     },
     {
-      score: 4500,
+      score: 12000,
       sender: "Metehan ❤️",
       time: "şimdi",
       avatarMood: "king",

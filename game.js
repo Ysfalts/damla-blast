@@ -108,42 +108,42 @@
     {
       key: "gym",
       name: "Gym Bro 💪",
-      unlockScore: 600,
-      role: "600 Puan Ödülü • Güçlü Blok",
+      unlockScore: 0, // config.rewardTiers'tan hesaplanır
+      role: "Güçlü Blok",
       power: "💪 Özel Yetenek: Tahtada patlatıldığında 100 kg dambıl basıp rastgele 3 dolu bloğu daha ezer!",
       quote: "Sporda 100 kilo basıyorum ama senin tek bir bakışın beni nakavt ediyor! 💪🔥"
     },
     {
       key: "mangal",
       name: "Mangal Şefi 🔥",
-      unlockScore: 1400,
-      role: "1400 Puan Ödülü • Joker Üretici",
+      unlockScore: 0,
+      role: "Joker Üretici",
       power: "🔥 Özel Yetenek: Tahtada patlatıldığında maşayı şıklatır ve anında +1 Joker hakkı doldurur!",
       quote: "Maşayı da tatlıyı da hazırladım, bu skordan sonra sana ziyafet borcumuz oldu! 🔥🍰"
     },
     {
       key: "crying",
       name: "Trip Yemiş 😭",
-      unlockScore: 2400,
-      role: "2400 Puan Ödülü • +150 Bonus Puan",
+      unlockScore: 0,
+      role: "+150 Bonus Puan",
       power: "😭 Özel Yetenek: Patlatıldığında 'Trip Çözüldü' bonusu olarak +150 ekstra puan kazandırır!",
       quote: "Tamam aşkım bir daha 'fark etmez' demeyeceğim, nereye istersen oraya gidiyoruz! 😭❤️"
     },
     {
       key: "broke",
       name: "Şaşkın Manita 😱",
-      unlockScore: 2400,
-      role: "2400 Puan Ödülü • Rekor Şoku",
+      unlockScore: 0,
+      role: "Rekor Şoku",
       power: "⚡ Özel Yetenek: Yüksek skor barajlarını yıktığında şaşkınlıktan küçük dilini yutar.",
-      quote: "2400 puan mı?! Bu nasıl bir zeka, karşında saygıyla eğiliyorum! 😱👑"
+      quote: "Bu skor ne?! Bu nasıl bir zeka, karşında saygıyla eğiliyorum! 😱👑"
     },
     {
       key: "king",
       name: "Kral Damat 👑",
-      unlockScore: 3500,
-      role: "3500 Puan Büyük Ödülü • VIP Mod",
+      unlockScore: 0,
+      role: "Büyük Final Ödülü • VIP Mod",
       power: "👑 Özel Yetenek: Büyük Doğum Günü Senedini mühürler ve tahtayı kraliçesi için kurtarır.",
-      quote: "3500 puanlık büyük ödül senindir kraliçem! İyi ki doğdun, iyi ki varsın! 👑🎂❤️"
+      quote: "Büyük doğum günü ödülü senindir kraliçem! İyi ki doğdun, iyi ki varsın! 👑🎂❤️"
     }
   ];
 
@@ -241,9 +241,44 @@
       try {
         if (window.navigator && typeof window.navigator.vibrate === "function") {
           window.navigator.vibrate(pattern);
+          return;
         }
       } catch (e) {
-        // iOS veya masaüstünde desteklenmiyorsa yoksay
+        // yoksay
+      }
+      this.iosHaptic(pattern);
+    }
+
+    // iPhone Safari navigator.vibrate desteklemiyor. iOS 18+ Safari'de gizli bir
+    // "switch" checkbox'ın etiketine tıklamak sistemin dokunsal (haptic) tıkını tetikler.
+    // Desen [titreşim, bekleme, titreşim, ...] ise her titreşim için bir tık atılır.
+    iosHaptic(pattern) {
+      try {
+        if (!this.hapticLabel) {
+          const label = document.createElement("label");
+          label.setAttribute("aria-hidden", "true");
+          label.style.cssText =
+            "position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden;";
+          const input = document.createElement("input");
+          input.type = "checkbox";
+          input.setAttribute("switch", "");
+          input.tabIndex = -1;
+          label.appendChild(input);
+          document.body.appendChild(label);
+          this.hapticLabel = label;
+        }
+        const steps = Array.isArray(pattern) ? pattern : [pattern];
+        let offset = 0;
+        for (let i = 0; i < steps.length; i += 2) {
+          if (offset === 0) {
+            this.hapticLabel.click();
+          } else {
+            setTimeout(() => this.hapticLabel.click(), offset);
+          }
+          offset += (steps[i] || 0) + (steps[i + 1] || 0);
+        }
+      } catch (e) {
+        // desteklenmiyorsa sessizce geç
       }
     }
 
@@ -504,13 +539,41 @@
   const config = JSON.parse(JSON.stringify(window.DAMLA_CONFIG || {}));
   const quoteDeck = new QuoteDeck();
 
+  // Final hedef değişince tüm hediye kademelerini ve WhatsApp bildirim eşiklerini aynı oranda ölçekle,
+  // böylece çubuk, koleksiyon ve kupon her zaman aynı sayıları gösterir.
+  function applyTargetScore(newTarget) {
+    const tiers = config.rewardTiers || [];
+    const currentFinal = (tiers.length && tiers[tiers.length - 1].score) || config.targetBirthdayScore || newTarget;
+    const ratio = newTarget / currentFinal;
+    if (ratio !== 1) {
+      const scale = (v) => Math.round((v * ratio) / 100) * 100;
+      tiers.forEach((t) => {
+        t.score = scale(t.score);
+      });
+      if (tiers.length) tiers[tiers.length - 1].score = newTarget;
+      (config.whatsappNotifications || []).forEach((w) => {
+        w.score = scale(w.score);
+      });
+    }
+    config.targetBirthdayScore = newTarget;
+
+    PERSONA_CATALOG.forEach((p) => {
+      const tier = tiers.find((t) => Array.isArray(t.unlockedFaces) && t.unlockedFaces.includes(p.key));
+      p.unlockScore = tier ? tier.score : 0;
+    });
+  }
+
+  function personaRoleText(p) {
+    return p.unlockScore > 0 ? `${p.unlockScore} Puan Ödülü • ${p.role}` : p.role;
+  }
+
   function loadSavedCustomizations() {
     try {
       const raw = safeStorage.getItem(STORAGE_KEY_CUSTOM);
       if (!raw) return;
       const saved = JSON.parse(raw);
       if (saved.boyfriendName) config.boyfriendName = saved.boyfriendName;
-      if (saved.targetBirthdayScore) config.targetBirthdayScore = Number(saved.targetBirthdayScore);
+      if (saved.targetBirthdayScore) applyTargetScore(Number(saved.targetBirthdayScore));
       if (saved.rewardText && config.coupon) config.coupon.rewardText = saved.rewardText;
       if (typeof saved.photoDataUrl === "string" && saved.photoDataUrl.startsWith("data:image")) {
         config.photos.main = saved.photoDataUrl;
@@ -520,6 +583,7 @@
     }
   }
 
+  applyTargetScore(config.targetBirthdayScore || 10000);
   loadSavedCustomizations();
 
   const loadedImages = {};
@@ -643,6 +707,13 @@
         done();
       }
     });
+  }
+
+  // <img> etiketleri için: özel fotoğraf yüklendiyse her karakterde o, yoksa karakterin kendi yüzü
+  function photoSrcFor(key) {
+    const photos = config.photos || {};
+    if (photos.main && photos.main.startsWith("data:image")) return photos.main;
+    return photos[key] || photos.happy || "assets/faces/metehan_happy.jpg";
   }
 
   function getImageForMood(mood) {
@@ -1041,7 +1112,28 @@
     panic: { emoji: "🥵", tag: "Sıkıştı & Terliyor!", cls: "mood-panic" }
   };
 
+  // Henüz puanla açılmamış bir karakter yüzü istenirse, açık olan benzer bir yüzle değiştir
+  const LOCKED_MOOD_FALLBACK = {
+    gym: "cool",
+    mangal: "party",
+    crying: "panic",
+    broke: "panic",
+    king: "love",
+    mindblown: "love"
+  };
+  function resolveUnlockedMood(mood) {
+    if (mood === "guilty") {
+      // "guilty" ağlayan Metehan fotoğrafını kullanır
+      return state.unlockedFaces.has("crying") ? mood : "sorry";
+    }
+    if (LOCKED_MOOD_FALLBACK[mood] && !state.unlockedFaces.has(mood)) {
+      return LOCKED_MOOD_FALLBACK[mood];
+    }
+    return mood;
+  }
+
   function setManitaMood(mood, customQuote = null) {
+    mood = resolveUnlockedMood(mood);
     const prevMood = state.mood;
     state.mood = mood;
     state.liveAvatarDirty = true;
@@ -1339,6 +1431,7 @@
 
   let comboTimer = null;
   function showComboShowcase(title, subtitle, avatarMood = "love") {
+    avatarMood = resolveUnlockedMood(avatarMood);
     dom.comboTitleText.textContent = title;
     dom.comboSubText.textContent = subtitle;
     dom.comboShowcase.classList.remove("hidden");
@@ -1596,10 +1689,10 @@
 
     if (nextTier) {
       dom.uiGoalLabel.textContent = `🎁 Sıradaki: ${nextTier.rewardShort}`;
-      dom.uiGoalNumbers.textContent = `${state.score} / ${nextTier.score}`;
+      dom.uiGoalNumbers.textContent = `${state.score.toLocaleString("tr-TR")} / ${nextTier.score.toLocaleString("tr-TR")}`;
     } else {
       dom.uiGoalLabel.textContent = "👑 VIP Doğum Günü Kuponu Hazır!";
-      dom.uiGoalNumbers.textContent = `${state.score} Puan (MAX)`;
+      dom.uiGoalNumbers.textContent = `${state.score.toLocaleString("tr-TR")} Puan (MAX)`;
     }
 
     if (state.score >= finalTarget && !state.couponUnlocked) {
@@ -1709,7 +1802,8 @@
     state.trayDirty = true;
     sfx.playBomb();
     triggerBoardShake();
-    addScore(cleared * 25 + 50);
+    // Boş alana atılan bomba puan vermesin
+    addScore(cleared > 0 ? cleared * 25 + 50 : 0);
     const quote = quoteDeck.pick("bombUsed");
     if (!state.tierJustUnlocked) setManitaMood("sorry", quote);
     spawnFloatingComicText("💐 ÖZÜR DİLERİM!", (centerC + 0.5) * state.cellSize, (centerR + 0.5) * state.cellSize);
@@ -1935,11 +2029,12 @@
     ctx.font = "900 28px 'Nunito', sans-serif";
     ctx.fillText("🎁 METEHAN'DAN KAZANILAN RESMİ DOĞUM GÜNÜ HAKLARI:", W / 2, 610);
 
+    const ts = tierScoreText;
     const tierItems = [
-      "✅ ☕ 1 Adet Kahve Sözü (600 Puan Barajı)",
-      "✅ 🍰 Kahve + İstediğin Tatlı (1400 Puan Barajı)",
-      "✅ 🍽️ Lüks Akşam Yemeği + Tatlı + Kahve (2400 Puan Barajı)",
-      "✅ 👑 VIP Tam Paket + %100 Haklılık Garantisi (3500 Puan)"
+      `✅ ☕ 1 Adet Kahve Sözü (${ts(1)} Puan Barajı)`,
+      `✅ 🍰 Kahve + İstediğin Tatlı (${ts(2)} Puan Barajı)`,
+      `✅ 🍽️ Lüks Akşam Yemeği + Tatlı + Kahve (${ts(3)} Puan Barajı)`,
+      `✅ 👑 VIP Tam Paket + %100 Haklılık Garantisi (${ts(4)} Puan)`
     ];
     ctx.fillStyle = "#ffffff";
     ctx.font = "800 27px 'Nunito', sans-serif";
@@ -2065,18 +2160,26 @@
     }, "image/png");
   }
 
+  // Hediye kademesinin puanını config'ten okunur biçimde döndürür (örn. 10.000)
+  function tierScoreText(idx) {
+    const tiers = config.rewardTiers || [];
+    const t = tiers[idx] || tiers[tiers.length - 1];
+    return (t ? t.score : config.targetBirthdayScore || 0).toLocaleString("tr-TR");
+  }
+
   function shareCouponViaWhatsApp() {
     sfx.playAvatarBoop();
-    const scoreVal = Math.max(state.score, state.bestScore, config.targetBirthdayScore || 3500);
+    const scoreVal = Math.max(state.score, state.bestScore, config.targetBirthdayScore || 10000);
     const bf = config.boyfriendName || "Metehan";
+    const ts = tierScoreText;
     const msg =
       `🚨 *RESMİ DOĞUM GÜNÜ SENEDİ BİLDİRİMİ* 🚨\n\n` +
       `Sevgili ${bf}, *Damla Blast* oyununda *${scoreVal.toLocaleString("tr-TR")} Puan* yaparak bütün doğum günü ödüllerini resmen kazandım! 🎂👑\n\n` +
       `*Kazanılan Resmi Haklarım:*\n` +
-      `✅ ☕ Kahve Sözü (600 Puan)\n` +
-      `✅ 🍰 İstediğim Tatlı (1400 Puan)\n` +
-      `✅ 🍽️ Lüks Akşam Yemeği (2400 Puan)\n` +
-      `✅ 👑 %100 Tartışmasız Haklılık Garantisi (3500 Puan)\n\n` +
+      `✅ ☕ Kahve Sözü (${ts(1)} Puan)\n` +
+      `✅ 🍰 İstediğim Tatlı (${ts(2)} Puan)\n` +
+      `✅ 🍽️ Lüks Akşam Yemeği (${ts(3)} Puan)\n` +
+      `✅ 👑 %100 Tartışmasız Haklılık Garantisi (${ts(4)} Puan)\n\n` +
       `*Not:* ${bf.toUpperCase()} ONAYLIDIR, İTİRAZ EDİLEMEZ! 😎🎂❤️`;
     const waUrl = `https://wa.me/?text=${encodeURIComponent(msg)}`;
     window.open(waUrl, "_blank", "noopener,noreferrer");
@@ -2088,7 +2191,7 @@
     sfx.playAvatarBoop();
     state.activePersonaDetail = persona;
 
-    const src = (config.photos && config.photos[persona.key]) || "assets/faces/metehan_happy.jpg";
+    const src = photoSrcFor(persona.key);
     if (dom.personaDetailImg) {
       dom.personaDetailImg.src = src;
       dom.personaDetailImg.alt = persona.name;
@@ -2097,7 +2200,7 @@
       dom.personaDetailName.textContent = persona.name;
     }
     if (dom.personaDetailRole) {
-      dom.personaDetailRole.textContent = persona.role || "Özel Metehan Karakteri";
+      dom.personaDetailRole.textContent = personaRoleText(persona) || "Özel Metehan Karakteri";
     }
     if (dom.personaDetailPower) {
       dom.personaDetailPower.textContent = persona.power || "";
@@ -2126,7 +2229,7 @@
           <strong>${t.rewardShort}</strong>
           <div style="font-size:0.66rem;color:#a6b4e8">${t.unlockedPersonaName}</div>
         </div>
-        <span style="font-weight:900;color:#ffcc29">${isReached ? "✅ AÇILDI" : `${t.score} P`}</span>
+        <span style="font-weight:900;color:#ffcc29">${isReached ? "✅ AÇILDI" : `${t.score.toLocaleString("tr-TR")} P`}</span>
       `;
       dom.collectionTiersList.appendChild(row);
     });
@@ -2134,12 +2237,12 @@
     dom.collectionFacesGrid.innerHTML = "";
     PERSONA_CATALOG.forEach((p) => {
       const unlocked = state.unlockedFaces.has(p.key) || state.bestScore >= p.unlockScore || state.score >= p.unlockScore;
-      const src = (config.photos && config.photos[p.key]) || "assets/faces/metehan_happy.jpg";
+      const src = photoSrcFor(p.key);
       const card = document.createElement("div");
       card.className = `face-collect-item ${unlocked ? "unlocked" : "locked"}`;
       card.innerHTML = `
         <img src="${src}" alt="${p.name}" />
-        <span>${unlocked ? `🔍 ${p.name}` : `🔒 ${p.unlockScore}P`}</span>
+        <span>${unlocked ? `🔍 ${p.name}` : `🔒 ${p.unlockScore.toLocaleString("tr-TR")}P`}</span>
       `;
       if (unlocked) {
         card.addEventListener("click", () => {
@@ -2812,6 +2915,13 @@
     const t = state.timeSec || 0;
     const dt = state.dt || 1;
 
+    // Retina ekranlarda net görünsün: tampon dpr kadar büyük, çizim 340x260 mantıksal koordinatta
+    const dpr = window.devicePixelRatio || 1;
+    if (dom.cakeCanvas.width !== Math.round(W * dpr)) {
+      dom.cakeCanvas.width = Math.round(W * dpr);
+      dom.cakeCanvas.height = Math.round(H * dpr);
+    }
+    ctx.setTransform(dom.cakeCanvas.width / W, 0, 0, dom.cakeCanvas.height / H, 0, 0);
     ctx.clearRect(0, 0, W, H);
 
     // 1. Arka Plan Işıltı Halkası
@@ -3211,6 +3321,24 @@
       `;
       dom.leaderboardList.appendChild(row);
     });
+
+    // Hediye çubuğu çentikleri: config'teki kademelerden, final hedefe oranla
+    const track = dom.uiGoalFill.parentElement;
+    track.querySelectorAll(".tier-tick").forEach((el) => el.remove());
+    const target = config.targetBirthdayScore || 10000;
+    (config.rewardTiers || []).slice(1).forEach((t) => {
+      const tick = document.createElement("span");
+      tick.className = "tier-tick";
+      tick.style.left = `${Math.min(97, (t.score / target) * 100)}%`;
+      tick.title = `${t.score.toLocaleString("tr-TR")} Puan: ${t.rewardShort}`;
+      tick.textContent = String(t.rewardShort || "🎁").split(" ")[0];
+      track.appendChild(tick);
+    });
+
+    const bombImg = dom.btnJokerBomb.querySelector("img");
+    if (bombImg) bombImg.src = photoSrcFor("sorry");
+    const rerollImg = dom.btnJokerReroll.querySelector("img");
+    if (rerollImg) rerollImg.src = photoSrcFor("cool");
   }
 
   function startNewGame() {
@@ -3396,7 +3524,7 @@
     const newCoupon = dom.inputCouponText.value.trim();
 
     config.boyfriendName = newName;
-    config.targetBirthdayScore = newTarget;
+    applyTargetScore(newTarget);
     if (config.coupon && newCoupon) {
       config.coupon.rewardText = newCoupon;
     }

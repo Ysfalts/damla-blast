@@ -26,7 +26,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=9" />
+  <link rel="stylesheet" href="style.css?v=10" />
 </head>
 <body>
   <div id="app-shell" class="app-shell">
@@ -177,15 +177,11 @@
       <div class="goal-progress-wrap" id="goal-progress-wrap" title="Detaylar için dokun!">
         <div class="goal-progress-labels">
           <span id="ui-goal-label">🎁 Sıradaki: ☕ Özel Kahve Sözü</span>
-          <span id="ui-goal-numbers" class="goal-reward-pill">0 / 600</span>
+          <span id="ui-goal-numbers" class="goal-reward-pill">0 / 2.000</span>
         </div>
         <div class="goal-progress-track">
           <div id="ui-goal-fill" class="goal-progress-fill" style="width: 0%"></div>
-          <!-- Aşama Çentikleri: 600 (17%), 1400 (40%), 2400 (68%), 3500 (97%) -->
-          <span class="tier-tick" style="left: 17%" title="600 Puan: Kahve + Gym Metehan">☕</span>
-          <span class="tier-tick" style="left: 40%" title="1400 Puan: Tatlı + Mangalcı Metehan">🍰</span>
-          <span class="tier-tick" style="left: 68%" title="2400 Puan: Akşam Yemeği + Trip Metehan">🍽️</span>
-          <span class="tier-tick" style="left: 97%" title="3500 Puan: VIP Kupon + Kral Metehan">👑</span>
+          <!-- Aşama çentikleri JS ile config.rewardTiers'tan oluşturulur -->
         </div>
       </div>
 
@@ -487,7 +483,7 @@
     </dialog>
   </div>
 
-  <script src="config.js?v=9"></script>
-  <script src="game.js?v=9"></script>
+  <script src="config.js?v=10"></script>
+  <script src="game.js?v=10"></script>
 </body>
 </html>
