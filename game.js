@@ -2326,7 +2326,7 @@
     const tierItems = [
       `✅ 🥪 İzmir Kumrusu + Ayran (${ts(1)} Puan Barajı)`,
       `✅ 🍮 Kahve + Kaymaklı Şambali (${ts(2)} Puan Barajı)`,
-      `✅ 🍽️ Lüks Akşam Yemeği + Tatlı + Kahve (${ts(3)} Puan Barajı)`,
+      `✅ 🍽️ Lüks Akşam Yemeği (${ts(3)} Puan Barajı)`,
       `✅ 👑 VIP Tam Paket + %100 Haklılık Garantisi (${ts(4)} Puan)`
     ];
     ctx.fillStyle = "#ffffff";

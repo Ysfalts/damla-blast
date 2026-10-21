@@ -70,7 +70,7 @@ window.DAMLA_CONFIG = {
       score: 7000,
       title: "3. Sürpriz: 🍽️ Romantik Akşam Yemeği!",
       walletStatus: "3. Sürpriz Açıldı 🍽️",
-      rewardShort: "🍽️ Akşam Yemeği + Tatlı",
+      rewardShort: "🍽️ Akşam Yemeği",
       unlockedFaces: ["crying", "broke"],
       unlockedPersonaName: "😭 Trip Yemiş & Şaşkın Metehan (+150 Bonus Puan Bloğu!)",
       quote: "Bu skor ne böyle?! Harikasın canım, romantik akşam yemeği sözüm de kilitlendi! 😍🍽️"
