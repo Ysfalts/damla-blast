@@ -25,7 +25,9 @@ window.DAMLA_CONFIG = {
     party: "assets/faces/metehan_party.jpg",         // 9. Doğum Günü Partisi Şapkalı
     broke: "assets/faces/metehan_broke.jpg",         // 10. Cüzdanı Ağlayan / Hesap Ödeyen
     king: "assets/faces/metehan_king.jpg",           // 11. Kral Tacı Metehan
-    mindblown: "assets/faces/metehan_king.jpg"  // 12. Aklı Başından Gitmiş (Mega Kombo)
+    mindblown: "assets/faces/metehan_king.jpg",  // 12. Aklı Başından Gitmiş (Mega Kombo)
+    kumru: "assets/faces/metehan_kumru.jpg",       // 13. İzmir Kumrucusu Metehan
+    sambali: "assets/faces/metehan_sambali.jpg"    // 14. Şambalici Metehan
   },
 
   // 3. KAFA BLOKLARI VE JOKER AYARLARI
@@ -48,21 +50,21 @@ window.DAMLA_CONFIG = {
     },
     {
       score: 2000,
-      title: "1. Sürpriz: ☕ Kahve Sözü Açıldı!",
-      walletStatus: "1. Sürpriz Açıldı ☕",
-      rewardShort: "☕ Özel Kahve Sözü",
-      unlockedFaces: ["gym"],
-      unlockedPersonaName: "💪 Gym Bro Metehan (Dambıl Bloğu Aktif!)",
-      quote: "İlk sürprizi açtın! Kahveler benden, ayrıca Gym Bro Metehan tahtaya indi 💪"
+      title: "1. Sürpriz: 🥪 İzmir Kumrusu Sözü Açıldı!",
+      walletStatus: "1. Sürpriz Açıldı 🥪",
+      rewardShort: "🥪 Kumru + Ayran Sözü",
+      unlockedFaces: ["gym", "kumru"],
+      unlockedPersonaName: "💪 Gym Bro & 🥪 Kumrucu Metehan (Çapraz Patlama Aktif!)",
+      quote: "İlk sürprizi açtın! Kumrular benden, ayrıca Gym Bro ve Kumrucu Metehan tahtaya indi 🥪💪"
     },
     {
       score: 4000,
-      title: "2. Sürpriz: 🍰 Tatlı + Kahve Keyfi!",
-      walletStatus: "2. Sürpriz Açıldı 🍰",
-      rewardShort: "🍰 Kahve + İstediğin Tatlı",
-      unlockedFaces: ["mangal"],
-      unlockedPersonaName: "🔥 Mangalcı Metehan (Joker Dolduran Blok Aktif!)",
-      quote: "Durdurulamıyorsun! Kahvenin yanına en sevdiğin tatlı da eklendi, Mangalcı Metehan görevde 🔥"
+      title: "2. Sürpriz: 🍮 Kaymaklı Şambali + Kahve!",
+      walletStatus: "2. Sürpriz Açıldı 🍮",
+      rewardShort: "🍮 Kahve + Kaymaklı Şambali",
+      unlockedFaces: ["mangal", "sambali"],
+      unlockedPersonaName: "🔥 Mangalcı & 🍮 Şambalici Metehan (Şerbet x2 Aktif!)",
+      quote: "Durdurulamıyorsun! Kahvenin yanına kaymaklı şambali da eklendi, Mangalcı ve Şambalici Metehan görevde 🍮🔥"
     },
     {
       score: 7000,
@@ -227,6 +229,14 @@ window.DAMLA_CONFIG = {
       "MANGALCI METEHAN ŞOV! Ateşimle sana +1 bedava Joker hakkı pişirdim 🔥🍖",
       "Maşayı şıklattım, alttaki joker hakkını senin için doldurdum bitanem! 🔥"
     ],
+    eventKumru: [
+      "İZMİR USULÜ ÇAPRAZ! Kumrucu Metehan hem satırı hem sütunu süpürdü 🥪💥",
+      "Sucuklu kaşarlı kumru gücü! Artı şeklinde tertemiz yaptım canım 🥪"
+    ],
+    eventSambali: [
+      "ŞERBETLİ MOLA! Bir sonraki patlatman çift puan bitanem 🍮✨",
+      "Kaymaklı şambali geldi, sıradaki satır 2 kat tatlı! 🍮"
+    ],
     eventTrip: [
       "TRİPLER ÇÖZÜLDÜ! Ağlayan Metehan'ın gönlünü aldın, +150 BONUS PUAN! 😭❤️",
       "Gözyaşlarım puana dönüştü, tam +150 ekstra puan kaptın kraliçem!"
@@ -286,7 +296,7 @@ window.DAMLA_CONFIG = {
     title: "İYİ Kİ DOĞDUN DAMLA! 🎂",
     subtitle: "Metehan'ın cüzdanını ve tüm blokları başarıyla patlattın!",
     couponHeader: "🎁 METEHAN'DAN VIP DOĞUM GÜNÜ KUPONU",
-    rewardText: "Bu ekranın görüntüsünü (screenshot) Metehan'a atarak:\n\n🍽️ 1 Adet Lüks Akşam Yemeği\n🍰 1 Adet İstediğin Tatlı & Kahve\n👑 1 Yıl Boyunca İtirazsız %100 Haklılık\n\nhakkı kazandın!",
+    rewardText: "Bu ekranın görüntüsünü (screenshot) Metehan'a atarak:\n\n🍽️ 1 Adet Lüks Akşam Yemeği\n🥪 1 Adet İzmir Kumrusu + Ayran\n🍮 1 Tabak Kaymaklı Şambali & Kahve\n👑 1 Yıl Boyunca İtirazsız %100 Haklılık\n\nhakkı kazandın!",
     stampText: "METEHAN ONAYLI • İTİRAZ EDİLEMEZ",
     continueButton: "Kuponu Cebe At & Sonsuz Moda Devam Et 🚀"
   }

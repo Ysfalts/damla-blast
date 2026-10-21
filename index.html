@@ -26,7 +26,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=16" />
+  <link rel="stylesheet" href="style.css?v=17" />
 </head>
 <body>
   <div id="app-shell" class="app-shell">
@@ -151,7 +151,8 @@
 
         <div class="current-score-box">
           <div id="ui-current-score" class="main-score">0</div>
-          <div id="ui-streak-badge" class="streak-badge hidden">🔥 SERİ x2</div>
+          <div id="ui-streak-badge" class="streak-badge hidden">🔥 KOMBO x2</div>
+          <div id="ui-serbet-badge" class="streak-badge serbet-badge hidden">🍮 ŞERBET x2</div>
         </div>
 
         <div class="top-controls">
@@ -177,7 +178,7 @@
       <!-- SÜRPRİZ HEDİYE & KARAKTER KATLAMA BARI -->
       <div class="goal-progress-wrap" id="goal-progress-wrap" title="Detaylar için dokun!">
         <div class="goal-progress-labels">
-          <span id="ui-goal-label">🎁 Sıradaki: ☕ Özel Kahve Sözü</span>
+          <span id="ui-goal-label">🎁 Sıradaki: 🥪 Kumru + Ayran Sözü</span>
           <span id="ui-goal-numbers" class="goal-reward-pill">0 / 2.000</span>
         </div>
         <div class="goal-progress-track">
@@ -377,6 +378,14 @@
             <div><strong>Mangalcı Bloğu:</strong> Patlayınca alttaki Joker haklarına +1 bedava hak ekler!</div>
           </div>
           <div class="guide-row">
+            <span class="guide-badge"><img src="assets/food/kumru.png" alt="Kumru" class="guide-food-icon" /></span>
+            <div><strong>Kumru Bloğu:</strong> Patlayınca İzmir usulü <strong>çapraz patlama</strong>: bulunduğu satır ve sütunu birlikte temizler!</div>
+          </div>
+          <div class="guide-row">
+            <span class="guide-badge"><img src="assets/food/sambali.png" alt="Şambali" class="guide-food-icon" /></span>
+            <div><strong>Şambali Bloğu:</strong> Patlayınca şerbetli mola: <strong>bir sonraki patlatman 2 kat puan</strong> verir!</div>
+          </div>
+          <div class="guide-row">
             <span class="guide-badge">😭</span>
             <div><strong>Trip Bloğu:</strong> Patlatıp gönlünü alınca tam <strong>+150</strong> ekstra puan verir!</div>
           </div>
@@ -484,7 +493,7 @@
     </dialog>
   </div>
 
-  <script src="config.js?v=16"></script>
-  <script src="game.js?v=16"></script>
+  <script src="config.js?v=17"></script>
+  <script src="game.js?v=17"></script>
 </body>
 </html>

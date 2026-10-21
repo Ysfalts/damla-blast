@@ -144,6 +144,22 @@
       role: "Büyük Final Ödülü • VIP Mod",
       power: "👑 Özel Yetenek: Büyük Doğum Günü Senedini mühürler ve tahtayı kraliçesi için kurtarır.",
       quote: "Büyük doğum günü ödülü senindir kraliçem! İyi ki doğdun, iyi ki varsın! 👑🎂❤️"
+    },
+    {
+      key: "kumru",
+      name: "Kumrucu Metehan 🥪",
+      unlockScore: 0,
+      role: "Güçlü Blok • Çapraz Patlama",
+      power: "🥪 Özel Yetenek: Patlayınca İzmir usulü çapraz patlama yapar, bulunduğu satır ve sütunu birlikte temizler!",
+      quote: "Kordon'da sucuklu kaşarlı kumru, yanında ayran... Bu söz benden canım! 🥪🌅"
+    },
+    {
+      key: "sambali",
+      name: "Şambalici Metehan 🍮",
+      unlockScore: 0,
+      role: "Güçlü Blok • Şerbet x2",
+      power: "🍮 Özel Yetenek: Patlayınca şerbetli mola verir, bir sonraki satır patlatman 2 kat puan kazandırır!",
+      quote: "Kaymaklı şambali da benden, tatlının en tatlısı sana yakışır bitanem! 🍮✨"
     }
   ];
 
@@ -725,6 +741,22 @@
   loadSavedCustomizations();
 
   const loadedImages = {};
+
+  // Kumru / Şambali güçlü bloklarının köşe rozetleri (şeffaf PNG ikonlar)
+  const FOOD_ICONS = {};
+  [
+    ["kumru", "assets/food/kumru.png"],
+    ["sambali", "assets/food/sambali.png"]
+  ].forEach(([key, src]) => {
+    const img = new Image();
+    img.onload = () => {
+      // İkon geldi: tahta ve tepsi yeniden çizilsin
+      state.boardDirty = true;
+      state.trayDirty = true;
+    };
+    img.src = src;
+    FOOD_ICONS[key] = img;
+  });
   const avatarSprites = {};
   const boardStaticCanvas = document.createElement("canvas");
 
@@ -792,6 +824,8 @@
       "broke",
       "king",
       "mindblown",
+      "kumru",
+      "sambali",
       "guilty"
     ];
     allMoods.forEach((m) => bakeAvatarSpriteForMood(m));
@@ -816,7 +850,9 @@
       "party",
       "broke",
       "king",
-      "mindblown"
+      "mindblown",
+      "kumru",
+      "sambali"
     ];
     let pending = keys.length;
     const done = () => {
@@ -909,6 +945,7 @@
     confettiActive: false,
     shownWaScores: new Set(), // Gösterilmiş WhatsApp bildirim skorları
     tierJustUnlocked: false, // Bu hamlede yeni hediye açıldıysa o cümle ezilmesin
+    serbetActive: false, // Şambali bloğu patladı: bir sonraki satır patlatma 2 kat puan
     activePersonaDetail: null,
     candles: [
       { letter: "D", color: "#ff477e", lit: true, smoke: [] },
@@ -971,6 +1008,7 @@
     uiBestScore: document.getElementById("ui-best-score"),
     uiCurrentScore: document.getElementById("ui-current-score"),
     uiStreakBadge: document.getElementById("ui-streak-badge"),
+    uiSerbetBadge: document.getElementById("ui-serbet-badge"),
     goalProgressWrap: document.getElementById("goal-progress-wrap"),
     uiGoalLabel: document.getElementById("ui-goal-label"),
     uiGoalNumbers: document.getElementById("ui-goal-numbers"),
@@ -1102,7 +1140,9 @@
     const events = [
       { mood: "gym", eventType: "gym", badge: "💪" },
       { mood: "mangal", eventType: "mangal", badge: "🔥" },
-      { mood: "crying", eventType: "trip", badge: "😭" }
+      { mood: "crying", eventType: "trip", badge: "😭" },
+      { mood: "kumru", eventType: "kumru", badge: "🥪" },
+      { mood: "sambali", eventType: "sambali", badge: "🍮" }
     ].filter((ev) => state.unlockedFaces.has(ev.mood));
     if (events.length > 0 && Math.random() < eventChance) {
       const chosenEv = events[Math.floor(Math.random() * events.length)];
@@ -1248,7 +1288,9 @@
     guilty: { emoji: "😅", tag: "Suçluluk Duyuyor", cls: "mood-guilty" },
     crying: { emoji: "😭", tag: "Trip Yedi Ağlıyor", cls: "mood-guilty" },
     broke: { emoji: "😱", tag: "Şaşkın Manita!", cls: "mood-panic" },
-    panic: { emoji: "🥵", tag: "Sıkıştı & Terliyor!", cls: "mood-panic" }
+    panic: { emoji: "🥵", tag: "Sıkıştı & Terliyor!", cls: "mood-panic" },
+    kumru: { emoji: "🥪", tag: "İzmir Kumrucusu", cls: "mood-happy" },
+    sambali: { emoji: "🍮", tag: "Şerbetli Mola", cls: "mood-happy" }
   };
 
   // Henüz puanla açılmamış bir karakter yüzü istenirse, açık olan benzer bir yüzle değiştir
@@ -1258,7 +1300,9 @@
     crying: "panic",
     broke: "panic",
     king: "love",
-    mindblown: "love"
+    mindblown: "love",
+    kumru: "party",
+    sambali: "love"
   };
   function resolveUnlockedMood(mood) {
     if (mood === "guilty") {
@@ -1453,6 +1497,23 @@
       }
     });
 
+    // Kumru bloğu: İzmir usulü çapraz patlama. Satırla patlıyorsa bulunduğu sütun,
+    // sütunla patlıyorsa bulunduğu satır da temizlenir (artı şekli).
+    let kumruExtraCells = 0;
+    Array.from(toClearMap.values()).forEach(({ r, c, cell }) => {
+      if (!cell || cell.eventType !== "kumru") return;
+      const clearColumn = fullRows.includes(r);
+      for (let i = 0; i < GRID_SIZE; i++) {
+        const rr = clearColumn ? i : r;
+        const cc = clearColumn ? c : i;
+        const key = `${rr},${cc}`;
+        if (!toClearMap.has(key) && state.board[rr][cc]) {
+          toClearMap.set(key, { r: rr, c: cc, cell: state.board[rr][cc] });
+          kumruExtraCells++;
+        }
+      }
+    });
+
     let faceClearedCount = 0;
     const triggeredEvents = new Set();
     let sumX = 0;
@@ -1518,6 +1579,25 @@
       spawnFloatingComicText("🔥 +1 JOKER PİŞTİ!", centerX, centerY + 14, "#ff9900");
     }
 
+    if (triggeredEvents.has("kumru")) {
+      eventBonusScore += 60 + kumruExtraCells * 15;
+      sfx.playGymSmash();
+      specialMood = "kumru";
+      specialQuote = quoteDeck.pick("eventKumru");
+      spawnFloatingComicText("🥪 İZMİR USULÜ ÇAPRAZ!", centerX, centerY - 18, "#ffb703");
+    }
+
+    // Şambali: bu patlatma önceki şerbeti kullanır mı? (kendi açtığı şerbet bir sonrakine kalır)
+    const serbetUsed = state.serbetActive;
+    if (serbetUsed) state.serbetActive = false;
+    if (triggeredEvents.has("sambali")) {
+      state.serbetActive = true;
+      sfx.playCashRegister();
+      specialMood = "sambali";
+      specialQuote = quoteDeck.pick("eventSambali");
+      spawnFloatingComicText("🍮 SONRAKİ PATLATMA x2!", centerX, centerY + 14, "#ffcf6e");
+    }
+
     if (triggeredEvents.has("trip")) {
       // Trip Bloğu: +150 Ekstra Puan
       eventBonusScore += 150;
@@ -1534,7 +1614,7 @@
     const comboMult = Math.min(COMBO_MAX_MULT, 1 + COMBO_STEP * Math.max(0, state.streak - 1));
     const faceBonus = faceClearedCount * 35;
     const gained =
-      Math.round(baseLineScore * comboMult) +
+      Math.round(baseLineScore * comboMult * (serbetUsed ? 2 : 1)) +
       faceBonus +
       eventBonusScore +
       (perfectClear ? PERFECT_CLEAR_BONUS : 0);
@@ -1544,7 +1624,13 @@
     const size = state.boardPixelSize;
     const textY = Math.max(40, Math.min(size - 72, centerY));
     const bannerY = centerY < size / 2 ? size * 0.82 : size * 0.18;
-    spawnFloatingComicText(`+${gained.toLocaleString("tr-TR")}`, centerX, textY + 36, "#ffcc29", "score");
+    spawnFloatingComicText(
+      `+${gained.toLocaleString("tr-TR")}${serbetUsed ? " 🍮x2" : ""}`,
+      centerX,
+      textY + 36,
+      "#ffcc29",
+      "score"
+    );
 
     // Nadir durumlar için özel büyük yazılar
     const special = config.specialPopups || {};
@@ -1931,6 +2017,10 @@
     checkWhatsAppNotifications();
   }
 
+  function updateSerbetBadge() {
+    if (dom.uiSerbetBadge) dom.uiSerbetBadge.classList.toggle("hidden", !state.serbetActive);
+  }
+
   function updateStreakBadge() {
     if (state.streak >= 2) {
       dom.uiStreakBadge.textContent = `🔥 KOMBO x${state.streak}`;
@@ -1941,6 +2031,7 @@
     // Kombo sürerken tahta çevresinde nokta ışıklar (Block Blast gibi); bitince söner
     dom.boardFrame.classList.toggle("combo-active", state.streak >= 2);
     dom.boardFrame.classList.toggle("combo-hot", state.streak >= 5);
+    updateSerbetBadge();
   }
 
   function updateJokerButtons() {
@@ -2233,8 +2324,8 @@
 
     const ts = tierScoreText;
     const tierItems = [
-      `✅ ☕ 1 Adet Kahve Sözü (${ts(1)} Puan Barajı)`,
-      `✅ 🍰 Kahve + İstediğin Tatlı (${ts(2)} Puan Barajı)`,
+      `✅ 🥪 İzmir Kumrusu + Ayran (${ts(1)} Puan Barajı)`,
+      `✅ 🍮 Kahve + Kaymaklı Şambali (${ts(2)} Puan Barajı)`,
       `✅ 🍽️ Lüks Akşam Yemeği + Tatlı + Kahve (${ts(3)} Puan Barajı)`,
       `✅ 👑 VIP Tam Paket + %100 Haklılık Garantisi (${ts(4)} Puan)`
     ];
@@ -2378,8 +2469,8 @@
       `🚨 *RESMİ DOĞUM GÜNÜ SENEDİ BİLDİRİMİ* 🚨\n\n` +
       `Sayın ${bf}, *Damla Blast* oyununda *${scoreVal.toLocaleString("tr-TR")} Puan* yaparak bütün doğum günü ödüllerini resmen kazandım! 🎂👑\n\n` +
       `*Kazanılan Resmi Haklarım:*\n` +
-      `✅ ☕ Kahve Sözü (${ts(1)} Puan)\n` +
-      `✅ 🍰 İstediğim Tatlı (${ts(2)} Puan)\n` +
+      `✅ 🥪 İzmir Kumrusu + Ayran (${ts(1)} Puan)\n` +
+      `✅ 🍮 Kaymaklı Şambali + Kahve (${ts(2)} Puan)\n` +
       `✅ 🍽️ Lüks Akşam Yemeği (${ts(3)} Puan)\n` +
       `✅ 👑 %100 Tartışmasız Haklılık Garantisi (${ts(4)} Puan)\n\n` +
       `*Not:* ${bf.toUpperCase()} ONAYLIDIR, İTİRAZ EDİLEMEZ! 😎🎂❤️`;
@@ -2437,7 +2528,10 @@
     });
 
     dom.collectionFacesGrid.innerHTML = "";
-    PERSONA_CATALOG.forEach((p) => {
+    // Kartlar açılma puanına göre sıralı (aynı puandakiler katalog sırasını korur)
+    PERSONA_CATALOG.slice()
+      .sort((a, b) => a.unlockScore - b.unlockScore)
+      .forEach((p) => {
       const unlocked = state.unlockedFaces.has(p.key) || state.bestScore >= p.unlockScore || state.score >= p.unlockScore;
       const src = photoSrcFor(p.key);
       const card = document.createElement("div");
@@ -2571,8 +2665,13 @@
       ctx.arc(cx, cy, faceR, 0, Math.PI * 2);
       ctx.stroke();
 
-      // Eğer Özel Etkinlik Bloğuysa (Gym 💪 / Mangal 🔥 / Trip 😭) sağ alt köşesine rozet çiz!
-      if (badge && size >= 24) {
+      // Kumru / Şambali bloklarında rozet olarak yiyecek ikonu (tepsideki küçük bloklarda da görünsün)
+      const foodIcon = cellMeta.eventType && FOOD_ICONS[cellMeta.eventType];
+      if (foodIcon && foodIcon.complete && foodIcon.naturalWidth && size >= 14) {
+        const iconSize = size * 0.55;
+        ctx.drawImage(foodIcon, x + size - iconSize, y + size - iconSize, iconSize, iconSize);
+      } else if (badge && size >= 24) {
+        // Eğer Özel Etkinlik Bloğuysa (Gym 💪 / Mangal 🔥 / Trip 😭) sağ alt köşesine rozet çiz!
         ctx.font = `${Math.max(10, Math.floor(size * 0.32))}px sans-serif`;
         ctx.textAlign = "right";
         ctx.textBaseline = "bottom";
@@ -3650,6 +3749,7 @@
     state.floatingTexts = [];
     state.shownWaScores.clear();
     state.couponUnlocked = false;
+    state.serbetActive = false;
     dom.btnGiftCoupon.classList.remove("unlocked");
     state.boardDirty = true;
     state.trayDirty = true;
@@ -3697,6 +3797,7 @@
           nextBonusScore: state.nextBonusScore,
           currentTierIndex: state.currentTierIndex,
           couponUnlocked: state.couponUnlocked,
+          serbetActive: state.serbetActive,
           shownWaScores: Array.from(state.shownWaScores)
         })
       );
@@ -3741,6 +3842,7 @@
       state.nextBonusScore = Number(saved.nextBonusScore) || config.bonusJokerEveryScore || 900;
       state.currentTierIndex = Number(saved.currentTierIndex) || 0;
       state.couponUnlocked = !!saved.couponUnlocked;
+      state.serbetActive = !!saved.serbetActive;
       state.shownWaScores = new Set(saved.shownWaScores || []);
       state.bombTargetingMode = false;
       state.particles = [];
@@ -4017,7 +4119,9 @@
         { mood: "mangal", quote: "Maşayı bıraktım sana bakıyorum Damla'm, hadi patlat bir satır 🔥" },
         { mood: "king", quote: "Doğum günü kraliçesi ne derse o olur, emrindeyim 👑❤️" },
         { mood: "love", quote: "Bana her dokunduğunda kalbim yerinden çıkacakmış gibi çarpıyor 😍❤️" },
-        { mood: "party", quote: "İyi ki doğdun canım! Düdüğü senin için çalıyorum 🥳🎂" }
+        { mood: "party", quote: "İyi ki doğdun canım! Düdüğü senin için çalıyorum 🥳🎂" },
+        { mood: "kumru", quote: "Kordon'a inip kumru yiyelim mi? Ayranlar benden canım 🥪" },
+        { mood: "sambali", quote: "Bu oyun bitince kaymaklı şambali ısmarlıyorum bitanem 🍮" }
       ];
       const pick = tapOptions[Math.floor(Math.random() * tapOptions.length)];
       setManitaMood(pick.mood, pick.quote);

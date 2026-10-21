@@ -1895,3 +1895,18 @@ dialog::backdrop {
   font-size: 10px;
   height: 22px;
 }
+
+/* Şambali şerbeti aktifken skor altındaki rozet */
+.serbet-badge {
+  background: linear-gradient(90deg, #c77d2a, #ffcf6e);
+  color: #3a1d00;
+  box-shadow: 0 2px 8px rgba(255, 183, 3, 0.5);
+}
+
+/* Koleksiyon rehberindeki kumru / şambali ikonları */
+.guide-food-icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  display: block;
+}
