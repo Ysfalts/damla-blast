@@ -940,6 +940,8 @@
     dragging: null,
     returning: null, // geçersiz bırakılan bloğun tepsiye dönüş animasyonu
     particles: [],
+    clearingCells: [], // sırayla sönen satır kareleri (yalnızca görsel; tahta mantığı anında temizlenir)
+    placeFlash: null, // yeni yerleşen karelerin kısa beyaz parlaması
     floatingTexts: [], // 5. Madde: Tahta üstü çizgi roman balonları
     confetti: [],      // Tam ekran doğum günü konfeti yağmuru
     confettiActive: false,
@@ -1373,6 +1375,10 @@
   const COMBO_MAX_MULT = 4; // en fazla x4
   const PERFECT_CLEAR_BONUS = 500; // tahta tamamen temizlenince
   const ESCAPE_FILL_RATIO = 0.75; // patlamadan önce bu kadar doluysa "son anda kurtuldun"
+  // Satır patlama animasyonu (Block Blast videosunda ~190 ms, ortadan iki yana yayılıyor)
+  const CLEAR_STEP_MS = 22; // her kare bir öncekinden bu kadar sonra söner
+  const CLEAR_FLASH_MS = 130; // sönen karenin beyaz parlamasının süresi
+  const PLACE_FLASH_MS = 170; // yeni yerleşen karelerin parlama süresi
 
   function placePieceOnBoard(trayIndex, startR, startC) {
     const piece = state.tray[trayIndex];
@@ -1382,6 +1388,7 @@
     state.lastMoveTime = performance.now();
     state.tierJustUnlocked = false;
     let placedBlocks = 0;
+    const placedCells = [];
 
     for (let r = 0; r < piece.rows; r++) {
       for (let c = 0; c < piece.cols; c++) {
@@ -1393,6 +1400,7 @@
             eventType: cellMeta.eventType || null,
             badge: cellMeta.badge || null
           };
+          placedCells.push([startR + r, startC + c]);
           placedBlocks++;
         }
       }
@@ -1401,6 +1409,7 @@
     state.tray[trayIndex] = null;
     state.boardDirty = true;
     state.trayDirty = true;
+    state.placeFlash = { cells: placedCells, at: performance.now() };
     sfx.playPlace();
     addScore(placedBlocks * 10);
 
@@ -1410,7 +1419,12 @@
     if (totalLines > 0) {
       state.streak++;
       state.noClearMoves = 0;
-      clearLinesAndCelebrate(fullRows, fullCols, totalLines);
+      // Patlama, bloğun bırakıldığı yerden iki yana doğru yayılır (Block Blast videosundaki gibi)
+      const origin = {
+        r: startR + Math.floor(piece.rows / 2),
+        c: startC + Math.floor(piece.cols / 2)
+      };
+      clearLinesAndCelebrate(fullRows, fullCols, totalLines, origin);
     } else {
       // Block Blast gibi: kombo, satır patlatmayan ilk hamlede değil, COMBO_GRACE_MOVES
       // hamle üst üste patlatma olmazsa biter
@@ -1480,7 +1494,7 @@
     return { fullRows, fullCols };
   }
 
-  function clearLinesAndCelebrate(fullRows, fullCols, totalLines) {
+  function clearLinesAndCelebrate(fullRows, fullCols, totalLines, origin = null) {
     // "Son anda kurtuldun" için patlamadan önceki doluluk
     const fillBeforeClear = getBoardOccupancyRatio();
     const toClearMap = new Map();
@@ -1520,11 +1534,22 @@
     let sumY = 0;
     let countCells = 0;
 
+    const clearStart = performance.now();
     toClearMap.forEach(({ r, c, cell }) => {
       if (cell) {
         if (cell.hasFace) faceClearedCount++;
         if (cell.eventType) triggeredEvents.add(cell.eventType);
-        spawnCellExplosion(r, c, cell);
+        // Görsel: kare, çıkış noktasına uzaklığı kadar gecikmeyle söner ve o anda kıvılcım saçar
+        let dist = 0;
+        if (origin) {
+          const inRow = fullRows.includes(r);
+          const inCol = fullCols.includes(c);
+          if (inRow && inCol) dist = Math.min(Math.abs(c - origin.c), Math.abs(r - origin.r));
+          else if (inRow) dist = Math.abs(c - origin.c);
+          else if (inCol) dist = Math.abs(r - origin.r);
+          else dist = Math.abs(r - origin.r) + Math.abs(c - origin.c); // kumru çaprazı
+        }
+        state.clearingCells.push({ r, c, cell, at: clearStart + dist * CLEAR_STEP_MS, popped: false });
         state.board[r][c] = null;
         sumX += (c + 0.5) * state.cellSize;
         sumY += (r + 0.5) * state.cellSize;
@@ -2848,7 +2873,9 @@
       hasLinePulse ||
       state.bombTargetingMode ||
       state.particles.length > 0 ||
-      state.floatingTexts.length > 0;
+      state.floatingTexts.length > 0 ||
+      state.clearingCells.length > 0 ||
+      state.placeFlash !== null;
 
     if (!needsRedraw) return;
     state.boardViewDirty = false;
@@ -2863,6 +2890,48 @@
 
     // 1 & 2. Önbellekten Statik Tahta + Yerleşmiş Bloklar (Tek GPU Blit!)
     ctx.drawImage(boardStaticCanvas, 0, 0, total, total);
+
+    // 2b. Sırayla sönen satır kareleri ve önlerinde giden beyaz parlama
+    const animNow = performance.now();
+    for (let i = state.clearingCells.length - 1; i >= 0; i--) {
+      const e = state.clearingCells[i];
+      if (animNow < e.at) {
+        draw3DBlock(ctx, e.c * cs, e.r * cs, cs, e.cell.color, e.cell, 1);
+        continue;
+      }
+      if (!e.popped) {
+        e.popped = true;
+        spawnCellExplosion(e.r, e.c, e.cell);
+      }
+      const t = (animNow - e.at) / CLEAR_FLASH_MS;
+      if (t >= 1) {
+        state.clearingCells.splice(i, 1);
+        continue;
+      }
+      const fx = (e.c + 0.5) * cs;
+      const fy = (e.r + 0.5) * cs;
+      const rad = cs * (0.55 + 0.45 * t);
+      const glow = ctx.createRadialGradient(fx, fy, 0, fx, fy, rad);
+      glow.addColorStop(0, `rgba(255, 255, 255, ${0.95 * (1 - t)})`);
+      glow.addColorStop(0.45, `rgba(255, 214, 236, ${0.65 * (1 - t)})`);
+      glow.addColorStop(1, "rgba(255, 190, 225, 0)");
+      ctx.fillStyle = glow;
+      ctx.fillRect(fx - rad, fy - rad, rad * 2, rad * 2);
+    }
+
+    // 2c. Yeni yerleşen karelerin kısa beyaz parlaması
+    if (state.placeFlash) {
+      const t = (animNow - state.placeFlash.at) / PLACE_FLASH_MS;
+      if (t >= 1) {
+        state.placeFlash = null;
+      } else {
+        ctx.fillStyle = `rgba(255, 255, 255, ${0.5 * (1 - t) * (1 - t)})`;
+        state.placeFlash.cells.forEach(([r, c]) => {
+          roundRect(ctx, c * cs + 2, r * cs + 2, cs - 4, cs - 4, 5);
+          ctx.fill();
+        });
+      }
+    }
 
     // 3. Sürükleme Sırasında Önizleme (Ghost) ve Tamamlanacak Satır Parlaması
     if (state.dragging && state.dragging.valid) {
@@ -3746,6 +3815,8 @@
     state.nextBonusScore = config.bonusJokerEveryScore || 900;
     state.bombTargetingMode = false;
     state.particles = [];
+    state.clearingCells = [];
+    state.placeFlash = null;
     state.floatingTexts = [];
     state.shownWaScores.clear();
     state.couponUnlocked = false;
@@ -3846,6 +3917,8 @@
       state.shownWaScores = new Set(saved.shownWaScores || []);
       state.bombTargetingMode = false;
       state.particles = [];
+      state.clearingCells = [];
+      state.placeFlash = null;
       state.floatingTexts = [];
       state.boardDirty = true;
       state.trayDirty = true;

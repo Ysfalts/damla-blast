@@ -9,7 +9,7 @@ window.DAMLA_CONFIG = {
   girlfriendName: "Damla",
   boyfriendName: "Metehan",
   birthdayAgeText: "🎂 İYİ Kİ DOĞDUN DAMLA! 🎂",
-  targetBirthdayScore: 10000,
+  targetBirthdayScore: 35000,
 
   // 2. METEHAN 12'Lİ YÜZ & KARAKTER PAKETİ
   photos: {
@@ -35,7 +35,7 @@ window.DAMLA_CONFIG = {
   eventBlockChance: 0.28,      // Kafa bloklarının Özel Güçlü (Gym / Mangal / Trip) olma oranı
   initialBombCount: 2,
   initialRerollCount: 2,
-  bonusJokerEveryScore: 900,
+  bonusJokerEveryScore: 3000,
 
   // 4. DOĞUM GÜNÜ SÜRPRİZ KADEMELERİ & KARAKTER AÇMA AŞAMALARI (Genişletilmiş Skor Aralıkları)
   rewardTiers: [
@@ -49,7 +49,7 @@ window.DAMLA_CONFIG = {
       quote: "Bakalım doğum günü sürprizlerinin hepsini açabilecek misin Damla'm 😎❤️"
     },
     {
-      score: 2000,
+      score: 5000,
       title: "1. Sürpriz: 🥪 İzmir Kumrusu Sözü Açıldı!",
       walletStatus: "1. Sürpriz Açıldı 🥪",
       rewardShort: "🥪 Kumru + Ayran Sözü",
@@ -58,7 +58,7 @@ window.DAMLA_CONFIG = {
       quote: "İlk sürprizi açtın! Kumrular benden, ayrıca Gym Bro ve Kumrucu Metehan tahtaya indi 🥪💪"
     },
     {
-      score: 4000,
+      score: 13000,
       title: "2. Sürpriz: 🍮 Kaymaklı Şambali + Kahve!",
       walletStatus: "2. Sürpriz Açıldı 🍮",
       rewardShort: "🍮 Kahve + Kaymaklı Şambali",
@@ -67,7 +67,7 @@ window.DAMLA_CONFIG = {
       quote: "Durdurulamıyorsun! Kahvenin yanına kaymaklı şambali da eklendi, Mangalcı ve Şambalici Metehan görevde 🍮🔥"
     },
     {
-      score: 7000,
+      score: 23000,
       title: "3. Sürpriz: 🍽️ Romantik Akşam Yemeği!",
       walletStatus: "3. Sürpriz Açıldı 🍽️",
       rewardShort: "🍽️ Akşam Yemeği",
@@ -76,7 +76,7 @@ window.DAMLA_CONFIG = {
       quote: "Bu skor ne böyle?! Harikasın canım, romantik akşam yemeği sözüm de kilitlendi! 😍🍽️"
     },
     {
-      score: 10000,
+      score: 35000,
       title: "FİNAL: 👑 VIP Doğum Günü Kuponu!",
       walletStatus: "Tüm Sürprizler Açıldı 👑",
       rewardShort: "👑 VIP Tam Paket + %100 Haklılık",
@@ -89,28 +89,28 @@ window.DAMLA_CONFIG = {
   // 4B. ÜSTTEN KAYARAK İNEN SAHTE WHATSAPP BİLDİRİMLERİ (Geniş Skor Aralıkları)
   whatsappNotifications: [
     {
-      score: 2500,
+      score: 6000,
       sender: "Metehan ❤️",
       time: "şimdi",
       avatarMood: "love",
       message: "Canım bu ne hız?! Daha ısınma turundaydık, rekorumu tarihe gömdün resmen 😍👑"
     },
     {
-      score: 5500,
+      score: 16000,
       sender: "Metehan ❤️",
       time: "şimdi",
       avatarMood: "gym",
       message: "Sporda 100 kilo basıyorum ama senin şu blokları patlatma gücün karşısında saygıyla eğiliyorum 💪😂"
     },
     {
-      score: 8500,
+      score: 28000,
       sender: "Metehan ❤️",
       time: "şimdi",
       avatarMood: "sorry",
       message: "Annem aradı 'Damla yine mi haklı çıktı' diye soruyor, 'Evet anne her zamanki gibi' dedim 🥰👑"
     },
     {
-      score: 12000,
+      score: 42000,
       sender: "Metehan ❤️",
       time: "şimdi",
       avatarMood: "king",
